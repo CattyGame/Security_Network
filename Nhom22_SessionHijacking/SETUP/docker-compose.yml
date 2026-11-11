@@ -1,0 +1,30 @@
+version: '3.8'
+
+# ==============================================================================
+# LAB MÔI TRƯỜNG ẢO HÓA AN TOÀN - ĐỒ ÁN AN NINH MẠNG UTH (NHÓM 22)
+# Đề tài: Tấn công chiếm quyền điều khiển phiên (Session Hijacking)
+# ==============================================================================
+
+services:
+  # 1. MÁY CHỦ ỨNG DỤNG MỤC TIÊU (Target Web Server)
+  uth-target-server:
+    build:
+      context: ..
+      dockerfile: SETUP/Dockerfile
+    container_name: uth_target_web_server
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      uth-isolated-lan:
+        ipv4_address: 192.168.100.10
+
+# Phân đoạn mạng nội bộ ảo hóa cô lập (Isolated Virtual Network)
+networks:
+  uth-isolated-lan:
+    name: uth_session_lab_net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.1

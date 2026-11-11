@@ -1,0 +1,1900 @@
+1
+00:00:05,800 --> 00:00:06,269
+Vâng.
+
+2
+00:00:13,909 --> 00:00:14,909
+Được rồi.
+
+3
+00:00:21,329 --> 00:00:27,829
+Chúng ta đang ở Module số 11, và trong module này chúng ta sẽ nói về Session Hijacking (Tấn công chiếm quyền điều khiển phiên).
+
+4
+00:00:28,079 --> 00:00:34,889
+Hãy cùng bắt đầu với Session Hijacking. Chúng ta sẽ xem xét qua một số mảng nội dung khác nhau,
+
+5
+00:00:34,900 --> 00:00:38,369
+bắt đầu từ các khái niệm căn bản ở mục tiêu đầu tiên.
+
+6
+00:00:38,580 --> 00:00:44,479
+Sau đó, chúng ta sẽ tìm hiểu về hai phân loại chính của Session Hijacking gồm:
+
+7
+00:00:44,619 --> 00:00:48,509
+ở tầng ứng dụng (Application Level) ở mục số hai, và mục số ba
+
+8
+00:00:48,520 --> 00:00:53,049
+chúng ta sẽ tìm hiểu Session Hijacking ở tầng mạng (Network Level), tiếp theo sẽ xem xét
+
+9
+00:00:53,060 --> 00:00:56,619
+các biện pháp phòng ngừa và đối phó phổ biến đối với Session Hijacking.
+
+10
+00:01:04,110 --> 00:01:09,599
+Bây giờ hãy cùng tìm hiểu Session Hijacking là gì qua slide này.
+
+11
+00:01:09,610 --> 00:01:13,720
+Bạn có thể thấy chúng ta có một kẻ tấn công (Attacker). Bạn nhận ra ngay vì anh ta mặc
+
+12
+00:01:13,730 --> 00:01:16,410
+áo hoodie trùm đầu và đeo mặt nạ.
+
+13
+00:01:16,809 --> 00:01:21,620
+Nhưng điều gì xảy ra nếu bạn nhìn vào luồng giao tiếp? Có một vài điều đang diễn ra
+
+14
+00:01:21,629 --> 00:01:23,089
+ở đây, để tôi dùng bút dạ quang làm nổi bật lên.
+
+15
+00:01:23,250 --> 00:01:26,309
+Chúng ta thấy có thông tin đăng nhập/xác thực (Credentials) được gửi đi.
+
+16
+00:01:26,569 --> 00:01:28,900
+Chúng ta thấy có quá trình thiết lập phiên làm việc (Session).
+
+17
+00:01:29,250 --> 00:01:33,230
+Có dữ liệu đang được gửi yêu cầu (request) và truyền tải.
+
+18
+00:01:33,569 --> 00:01:36,360
+Và điều gì đang xảy ra ở phía dưới này? Kẻ tấn công này đang làm gì?
+
+19
+00:01:36,529 --> 00:01:41,750
+Đang bắt gói tin (sniffing traffic). Hắn có card mạng đặt ở
+
+20
+00:01:41,760 --> 00:01:44,830
+chế độ hỗn tạp (promiscuous mode) và thu thập toàn bộ thông tin đó.
+
+21
+00:01:45,089 --> 00:01:51,550
+Bạn có nhận thấy điều gì còn thiếu ở đây không? Vì sao kẻ tấn công lại có thể làm được điều này?
+
+22
+00:01:51,699 --> 00:01:53,860
+Đáng lẽ hắn không được phép lấy được thông tin này chứ.
+
+23
+00:01:54,349 --> 00:01:58,309
+Nhưng chuyện gì đã xảy ra? Không hề có mã hóa! Và chúng ta sẽ thấy rằng
+
+24
+00:01:58,319 --> 00:02:01,949
+đây chính là một trong những nguyên nhân lớn nhất khiến Session Hijacking thành công.
+
+25
+00:02:02,680 --> 00:02:05,120
+Được rồi, bây giờ hãy nhìn quy trình từ dưới lên.
+
+26
+00:02:05,269 --> 00:02:08,350
+Chúng ta sẽ bắt đầu từ phần dưới cùng này.
+
+27
+00:02:08,589 --> 00:02:14,240
+Những gì kẻ tấn công làm là đặt mình vào vị trí mà hắn có thể
+
+28
+00:02:14,250 --> 00:02:17,830
+giám sát lưu lượng mạng. Đây là kẻ tấn công ở góc dưới này,
+
+29
+00:02:18,470 --> 00:02:25,139
+hắn có thể quan sát luồng giao dịch qua lại giữa mục tiêu ở đây
+
+30
+00:02:25,149 --> 00:02:27,460
+và máy chủ ở đằng kia.
+
+31
+00:02:27,839 --> 00:02:33,839
+Điều tiếp theo hắn làm là giám sát luồng gói tin, và đây là
+
+32
+00:02:33,850 --> 00:02:39,699
+từ khóa cực kỳ quan trọng: "Dự đoán" (predict), cùng một cụm từ quan trọng nữa:
+
+33
+00:02:39,710 --> 00:02:43,130
+"Số thứ tự gói tin" (sequence number). Hắn sẽ theo dõi sát sao
+
+34
+00:02:43,139 --> 00:02:44,979
+số thứ tự TCP Sequence Number đó.
+
+35
+00:02:45,429 --> 00:02:48,839
+Và sau đó hắn sẽ thực hiện làm mất đồng bộ (Desynchronization).
+
+36
+00:02:48,850 --> 00:02:54,220
+Hắn sẽ ngắt kết nối đang nối tới máy của nạn nhân.
+
+37
+00:02:54,550 --> 00:02:59,289
+Và bởi vì hắn đã dự đoán được Session ID,
+
+38
+00:02:59,470 --> 00:03:04,139
+hắn có thể chiếm quyền phiên làm việc đó. Và sau khi chiếm được phiên,
+
+39
+00:03:04,149 --> 00:03:07,259
+hắn sẽ làm gì tiếp theo? Bắt đầu chèn gói tin giả mạo (injecting packets). Nghĩa là sao?
+
+40
+00:03:07,270 --> 00:03:12,179
+Hắn có thể làm bất cứ điều gì hắn muốn, tùy thuộc vào mức độ tiếp quản phiên.
+
+41
+00:03:12,210 --> 00:03:17,789
+Và đó chính là quy trình diễn ra của một cuộc tấn công chiếm quyền điều khiển phiên.
+
+42
+00:03:18,779 --> 00:03:21,830
+Về tấn công Session Hijacking,
+
+43
+00:03:22,289 --> 00:03:27,820
+nó diễn ra ở một số tầng khác nhau trong mô hình OSI.
+
+44
+00:03:27,830 --> 00:03:34,110
+Một khu vực là ở tầng mạng, nơi chúng ta xem xét TCP hoặc UDP ngay
+
+45
+00:03:34,119 --> 00:03:39,570
+phía trên tầng mạng. Chúng ta có tầng 3 là Network, và tầng giao vận / phiên
+
+46
+00:03:39,580 --> 00:03:44,440
+là tầng 4. Và đồng thời còn diễn ra ở tầng ứng dụng (Application Layer),
+
+47
+00:03:44,449 --> 00:03:49,729
+tức là tầng 7 của mô hình OSI, mà trong trường hợp này chúng ta xem xét giao thức HTTP.
+
+48
+00:03:50,889 --> 00:03:54,009
+Được rồi, chúng ta cần làm rõ một điều quan trọng ở đây.
+
+49
+00:03:54,110 --> 00:03:56,429
+Chúng ta không chỉ đơn thuần nói về Spoofing (Mạo danh).
+
+50
+00:03:56,800 --> 00:04:02,229
+Spoofing là khi tôi thay đổi địa chỉ IP hoặc MAC để giả dạng thành một người dùng khác và đánh cắp dữ liệu, chứ tôi không thực sự chiếm quyền một phiên đang chạy.
+
+51
+00:04:02,240 --> 00:04:06,589
+Còn điều chúng ta đang làm ở đây là Hijacking (Cướp quyền phiên). Trong trường hợp này,
+
+52
+00:04:06,970 --> 00:04:09,580
+đang có một phiên làm việc hợp lệ và đang hoạt động giữa thiết bị và web server,
+
+53
+00:04:09,779 --> 00:04:16,769
+và kẻ tấn công sẽ nhảy vào chiếm quyền điều khiển phiên đó.
+
+54
+00:04:16,779 --> 00:04:19,519
+Đó chính là sự khác biệt cốt lõi.
+
+55
+00:04:19,739 --> 00:04:25,459
+Và đó là trọng tâm của module này: Tấn công chiếm quyền phiên (Session Hijacking).
+
+56
+00:04:33,959 --> 00:04:39,339
+Bây giờ chúng ta bước vào mục tiêu số 2, nơi chúng ta tìm hiểu loại hình cụ thể của Session Hijacking.
+
+57
+00:04:39,350 --> 00:04:42,859
+Phần đầu tiên chúng ta thấy ở đây, phần tầng mạng ta sẽ nói sau,
+
+58
+00:04:42,869 --> 00:04:48,480
+đó là Session Hijacking ở tầng ứng dụng (Application Level).
+
+59
+00:04:49,519 --> 00:04:55,679
+Ở tầng ứng dụng, có rất nhiều kỹ thuật có thể xảy ra nếu bạn nhìn vào đây.
+
+60
+00:04:55,690 --> 00:04:58,480
+Những gì chúng ta sẽ làm là dự đoán Session Token (mã định danh phiên).
+
+61
+00:04:58,489 --> 00:05:03,950
+Chúng ta có thể đánh cắp các Session ID này bằng cách nghe lén (sniffing).
+
+62
+00:05:04,149 --> 00:05:08,820
+Chúng ta dự đoán giá trị tiếp theo. Kỹ thuật này hoạt động như thế nào?
+
+63
+00:05:08,829 --> 00:05:15,510
+Hãy cùng xem các hệ thống này vận hành ra sao.
+
+64
+00:05:15,679 --> 00:05:19,390
+Chúng ta giả định trước một vài điều như sau:
+
+65
+00:05:19,480 --> 00:05:24,290
+Điều thứ nhất, ta có kết nối từ máy tính xách tay của tôi đến máy chủ web,
+
+66
+00:05:24,600 --> 00:05:28,600
+đúng không nào? Và kết nối đó đã được thiết lập thành công
+
+67
+00:05:28,609 --> 00:05:30,700
+thông qua cú bắt tay 3 bước TCP (TCP 3-way handshake).
+
+68
+00:05:31,040 --> 00:05:36,160
+Hiện tại tôi đang gửi và nhận các gói tin qua kết nối đó.
+
+69
+00:05:37,209 --> 00:05:43,989
+Bây giờ hãy xem xét các quy luật/mẫu hình của Session Token mà kết nối sử dụng.
+
+70
+00:05:44,320 --> 00:05:47,670
+Nhìn sang đây, chúng ta thấy có dạng Token tuần tự (Sequential tokens).
+
+71
+00:05:48,230 --> 00:05:51,149
+Phần này là hằng số cố định, không thay đổi.
+
+72
+00:05:51,570 --> 00:05:54,549
+Nhưng nếu bạn nhìn vào con số khác đi kèm với token này,
+
+73
+00:05:54,559 --> 00:05:58,890
+nó tự tăng dần: ta thấy 1, 2, 3, 4 ở cột này.
+
+74
+00:05:59,399 --> 00:06:06,149
+Dạng này cực kỳ dễ đoán. Một trường hợp khác là không gian token quá nhỏ (Small token space).
+
+75
+00:06:06,160 --> 00:06:09,850
+Nếu chúng ta nhìn vào đây, đặc biệt nếu chỉ có 2 ký tự,
+
+76
+00:06:09,859 --> 00:06:16,720
+hoặc kể cả 4 ký tự thì không gian mẫu vẫn quá nhỏ đối với một cuộc tấn công vét cạn (Brute-force).
+
+77
+00:06:16,730 --> 00:06:20,369
+Kẻ tấn công hoàn toàn có thể brute-force ra token tiếp theo.
+
+78
+00:06:20,899 --> 00:06:26,739
+Ngoài ra, nhìn sang phía ngoài cùng bên phải màn hình, chúng ta thấy có vài thành phần:
+
+79
+00:06:26,750 --> 00:06:32,670
+một hằng số cố định, một ngày tháng. Ta phân tích và thấy đây là ngày tháng.
+
+80
+00:06:32,679 --> 00:06:34,500
+Được rồi, đó là ngày hôm nay.
+
+81
+00:06:34,799 --> 00:06:40,779
+Và rồi ta thấy có ký tự giờ T, và khi thời gian trôi qua từng giây, từng phút
+
+82
+00:06:40,790 --> 00:06:42,000
+nó sẽ thay đổi. Đó là mốc thời gian.
+
+83
+00:06:42,010 --> 00:06:48,350
+Vậy tôi có thể đoán trước ngày giờ tiếp theo và dự đoán chính xác Session Token đó.
+
+84
+00:06:49,209 --> 00:06:53,200
+Vì sao lại có thể làm được việc này? Nguyên nhân thứ nhất:
+
+85
+00:06:53,209 --> 00:06:57,390
+Ở dưới này: Thiếu cơ chế giới hạn tần suất (Lack of rate limiting). Không có rate limiting,
+
+86
+00:06:57,399 --> 00:07:04,239
+bạn có thể tạo và thử hàng loạt token, bạn có thể đoán đi đoán lại nhiều lần
+
+87
+00:07:04,250 --> 00:07:06,950
+mà không hề bị hệ thống chặn.
+
+88
+00:07:07,209 --> 00:07:08,549
+Điều đó rất thuận lợi cho kẻ tấn công.
+
+89
+00:07:08,940 --> 00:07:12,940
+Và nguyên nhân thứ hai, nhân tiện ta cũng sẽ gặp lại ở phần sau,
+
+90: 90
+00:07:12,950 --> 00:07:17,269
+khi đến phần tấn công mạng không dây (Wi-Fi),
+
+91: 91
+00:07:17,290 --> 00:07:20,630
+chúng ta sẽ đào sâu về bộ sinh số ngẫu nhiên, cụ thể là
+
+92: 92
+00:07:20,779 --> 00:07:21,839
+PRNG (Bộ sinh số giả ngẫu nhiên).
+
+93: 93
+00:07:22,200 --> 00:07:28,989
+Với thuật toán PRNG có thể đoán trước được, bạn có thể sinh ra chuỗi token tiếp theo
+
+94: 94
+00:07:29,160 --> 00:07:35,209
+bởi vì quy luật của nó có tính dự đoán rất cao. Đó là những lý do ta có thể dự đoán
+
+95: 95
+00:07:35,220 --> 00:07:36,519
+Session Token.
+
+96: 96
+00:07:36,779 --> 00:07:40,540
+Và nếu ta đoán được token, kết hợp với việc mạo danh địa chỉ IP (IP spoofing),
+
+97: 97
+00:07:40,649 --> 00:07:46,799
+thì ta có thể chiếm quyền phiên làm việc đó, và đó chính là những gì ta tìm hiểu ở phần này.
+
+98: 98
+00:07:48,070 --> 00:07:52,929
+Được rồi, một khi chúng ta đã dự đoán được Session Token,
+
+99: 99
+00:07:53,220 --> 00:07:55,730
+thì ta có thể nhảy vào tiếp quản phiên làm việc đó.
+
+100: 100
+00:07:56,200 --> 00:08:00,950
+Và anh chàng người dùng kia vẫn đang ngồi trên máy tính lướt web rất vui vẻ.
+
+101
+00:08:00,959 --> 00:08:06,049
+Anh ta đang kết nối đến một ứng dụng web, mà không hề hay biết rằng kẻ tấn công
+
+102
+00:08:06,299 --> 00:08:12,790
+đang đoán được Session ID, mạo danh địa chỉ IP của nạn nhân, và chuyển hướng
+
+103
+00:08:12,799 --> 00:08:18,619
+gói tin giao tiếp tiếp theo: thay vì gửi về cho nạn nhân thì nó lại gửi về cho kẻ tấn công,
+
+104
+00:08:18,690 --> 00:08:22,760
+và kẻ tấn công về cơ bản đang thực hiện một cuộc tấn công Man-in-the-Middle (Đứng ở giữa).
+
+105
+00:08:23,700 --> 00:08:27,070
+Được rồi, chúng ta còn có khả năng làm tổn hại
+
+106
+00:08:27,079 --> 00:08:31,720
+Session ID bằng phương pháp thao túng Man-in-the-Browser (Kẻ đứng giữa trình duyệt).
+
+107
+00:08:31,820 --> 00:08:36,400
+Kỹ thuật này thực sự rất thú vị, hãy xem nó hoạt động thế nào.
+
+108
+00:08:36,489 --> 00:08:41,460
+Đây là MITB - Man-in-the-Browser. Cuộc tấn công này bắt đầu từ đâu?
+
+109
+00:08:41,820 --> 00:08:47,690
+Đầu tiên, ai đó lướt web trên internet và vô tình bị nhiễm mã độc Trojan Horse.
+
+110
+00:08:48,669 --> 00:08:54,099
+Những gì Trojan làm là chặn bắt các lệnh gọi giữa trình duyệt và lớp bảo mật của nó.
+
+111
+00:08:54,219 --> 00:08:58,570
+Về cơ bản, cơ chế bảo mật đã bị vô hiệu hóa đối với con Trojan này.
+
+112
+00:08:58,580 --> 00:09:01,890
+Đó là bước số một: lây nhiễm. Bước số hai:
+
+113
+00:09:02,140 --> 00:09:07,520
+Một đoạn mã độc hại hoặc tiện ích mở rộng (extension) độc hại được cài vào trình duyệt.
+
+114
+00:09:07,960 --> 00:09:14,330
+Người dùng mở trình duyệt lên sử dụng, extension độc hại đó lập tức được kích hoạt.
+
+115
+00:09:14,340 --> 00:09:20,530
+Bước số bốn: xuất hiện một trình xử lý (handler). Handler là gì? Nó sẽ phản ứng theo những điều kiện nhất định,
+
+116
+00:09:20,580 --> 00:09:23,780
+ví dụ như khi nhấp chuột (onclick), di chuột (mousemove) v.v.
+
+117
+00:09:23,789 --> 00:09:28,260
+Handler này sẽ chạy mỗi khi bạn truy cập vào một trang web. Nhưng trang web nào?
+
+118
+00:09:28,270 --> 00:09:31,640
+Bước số năm: có một danh sách mục tiêu định sẵn.
+
+119
+00:09:31,650 --> 00:09:34,929
+Nó có thể chứa danh sách hàng ngàn tổ chức tài chính, ngân hàng khác nhau.
+
+120
+00:09:34,940 --> 00:09:39,559
+Bây giờ tôi là người dùng, tôi vào trang web ngân hàng của mình để đăng nhập,
+
+121
+00:09:39,669 --> 00:09:45,489
+ngay lập tức handler đó bắt được sự kiện người dùng truy cập trang ngân hàng mục tiêu.
+
+122
+00:09:45,500 --> 00:09:51,099
+Sau đó tôi bấm nút thực hiện giao dịch,
+
+123
+00:09:51,109 --> 00:09:53,260
+và nó sẽ can thiệp vào DOM (Document Object Model).
+
+124
+00:09:53,770 --> 00:09:57,359
+DOM là mô hình được dùng trong HTTP để quản lý các đối tượng trên trang web,
+
+125
+00:09:57,609 --> 00:10:04,210
+cho phép trích xuất và chỉnh sửa dữ liệu. Giả sử tôi vào ngân hàng và muốn
+
+126
+00:10:04,219 --> 00:10:07,059
+chuyển 10 đô la từ tài khoản thanh toán sang tài khoản tiết kiệm.
+
+127
+00:10:07,489 --> 00:10:14,369
+Tôi nhấn thực hiện giao dịch 10 đô đó.
+
+128
+00:10:14,380 --> 00:10:19,520
+Nhưng ở chế độ nền (background), mã độc này
+
+129
+00:10:20,190 --> 00:10:25,960
+đang bí mật rút sạch toàn bộ số tiền của tôi và chuyển sang tài khoản của kẻ tấn công!
+
+130
+00:10:26,340 --> 00:10:30,650
+Còn ở giao diện phía trước (foreground), màn hình vẫn hiện thông báo: "Chúc mừng, bạn vừa chuyển thành công 10 đô la".
+
+131
+00:10:30,659 --> 00:10:35,140
+Mọi thứ trông hoàn toàn bình thường! Sau khi máy chủ xử lý giao dịch,
+
+132
+00:10:35,349 --> 00:10:39,570
+hóa đơn biên lai được tạo ra trông cực kỳ hợp lệ.
+
+133
+00:10:39,580 --> 00:10:42,950
+Nhưng ở phía sau, giao dịch thực tế đã bị tráo đổi mà người dùng không hề hay biết!
+
+134
+00:10:43,080 --> 00:10:49,489
+Thật sự rất nguy hiểm. Kỹ thuật tiếp theo chúng ta nói đến là
+
+135
+00:10:50,260 --> 00:10:53,539
+Session Replay (Tấn công phát lại phiên).
+
+136
+00:10:53,549 --> 00:10:57,140
+Điều tôi muốn nói là kỹ thuật này không phải lúc nào cũng hiệu quả, nhưng nó hoạt động được trong một số trường hợp nhất định.
+
+137
+00:10:57,150 --> 00:11:01,070
+Kẻ tấn công sẽ nghe lén (sniffing) và thu thập luồng giao tiếp giữa người dùng và phiên làm việc,
+
+138
+00:11:01,080 --> 00:11:06,330
+rồi sau đó hắn phát lại (replay) các gói tin đó lên server để đòi quyền truy cập.
+
+139
+00:11:06,409 --> 00:11:10,440
+Không phải lúc nào cũng thành công, nhưng đây luôn là một nguy cơ tiềm tàng.
+
+140
+00:11:10,450 --> 00:11:14,919
+Kỹ thuật tiếp theo thuộc nhóm tấn công mà trong đó kẻ tấn công
+
+141
+00:11:14,929 --> 00:11:16,640
+chủ động "mớm" sẵn cho nạn nhân thông tin Session ID hoặc Token
+
+142
+00:11:16,929 --> 00:11:23,049
+để nạn nhân sử dụng trong quá trình giao tiếp.
+
+143
+00:11:23,239 --> 00:11:29,349
+Nhìn vào đây: Bước số một bắt đầu bằng việc dụ dỗ nạn nhân nhấp vào liên kết (entice to click).
+
+144
+00:11:29,359 --> 00:11:35,830
+Nạn nhân nhấp vào liên kết đó. Điều gì xảy ra tiếp theo?
+
+145
+00:11:35,840 --> 00:11:41,609
+Họ đăng nhập vào một máy chủ có lỗ hổng, và hãy xem: họ có một cookie.
+
+146
+00:11:41,710 --> 00:11:48,020
+Cookie đó, Session ID đó lấy từ đâu ra? Lấy từ chính kẻ tấn công!
+
+147
+00:11:48,030 --> 00:11:53,450
+Kẻ tấn công lừa nạn nhân xác thực danh tính bằng một Session ID đã được biết trước.
+
+148
+00:11:53,530 --> 00:11:56,469
+Sau khi nạn nhân đăng nhập thành công với Session ID đó,
+
+149
+00:11:56,479 --> 00:11:59,559
+kẻ tấn công vì đã biết trước Session ID này nên có thể vào đăng nhập bất cứ khi nào hắn muốn.
+
+150
+00:11:59,760 --> 00:12:06,039
+Điều bạn cần nhớ về tấn công Session Fixation (Cố định phiên) là:
+
+151
+00:12:06,049 --> 00:12:08,390
+Kẻ tấn công cung cấp một Session ID hợp lệ và dụ nạn nhân đăng nhập bằng Session ID đó.
+
+152
+00:12:08,739 --> 00:12:15,150
+Vì kẻ tấn công đã nắm rõ Session ID, hắn có thể sử dụng lại phiên đó tùy ý.
+
+153
+00:12:15,159 --> 00:12:21,520
+Tiếp theo là Proxy Server. Kỹ thuật này cũng bắt đầu bằng việc dụ nhấp link độc hại.
+
+154
+00:12:21,530 --> 00:12:27,919
+Nạn nhân nhấp vào link, và mã độc sẽ thay đổi cài đặt mạng LAN trên máy tính nạn nhân
+
+155
+00:12:27,929 --> 00:12:34,809
+khiến mọi lưu lượng đều phải đi qua Proxy Server của kẻ tấn công, từ đó hắn kiểm soát phiên hoàn toàn.
+
+156
+00:12:34,820 --> 00:12:39,200
+Bây giờ là cuộc tấn công mang tên CRIME attack.
+
+157
+00:12:39,210 --> 00:12:45,219
+CRIME là viết tắt của: "Compression Ratio Info-leak Made Easy" (Làm rò rỉ thông tin qua tỷ lệ nén dữ liệu).
+
+158
+00:12:45,229 --> 00:12:48,609
+Hãy nghĩ xem những giao thức hay ứng dụng nào sử dụng nén dữ liệu?
+
+159
+00:12:48,619 --> 00:12:51,739
+Ngoài JPEG, GIF, MP3, MP4 thì SSL, TLS, SPDY và mở rộng ra là HTTPS
+
+160
+00:12:51,750 --> 00:12:54,390
+cũng từng hỗ trợ cơ chế nén dữ liệu.
+
+161
+00:12:54,609 --> 00:13:01,510
+Và trong trường hợp này, kẻ tấn công tấn công vào thuật toán nén đó,
+
+162
+00:13:01,520 --> 00:13:07,590
+dựa vào sự thay đổi độ dài gói tin để trích xuất thông tin Session Cookie, từ đó thiết lập phiên mới.
+
+163
+00:13:07,599 --> 00:13:09,299
+Hắn giải mã từng bit một và cuối cùng giải mã toàn bộ phiên làm việc.
+
+164
+00:13:10,090 --> 00:13:12,679
+Tiếp theo là cuộc tấn công mang tên Forbidden Attack.
+
+165
+00:13:12,849 --> 00:13:19,609
+Forbidden có nghĩa là "bị cấm". Điều gì là bị cấm?
+
+166
+00:13:19,619 --> 00:13:26,549
+Điều bạn không bao giờ được phép làm trong mật mã học là: Tái sử dụng giá trị Nonce (Reuse a cryptographic Nonce).
+
+167
+00:13:26,559 --> 00:13:29,900
+Từ "Nonce" trong mật mã có nghĩa là gì?
+
+168
+00:13:30,010 --> 00:13:36,549
+Đó là con số ngẫu nhiên chỉ được sử dụng duy nhất một lần (Number used ONCE).
+
+169
+00:13:36,659 --> 00:13:43,099
+Trong trường hợp này, hệ thống lại tái sử dụng Nonce trong quá trình bắt tay TLS (TLS Handshake).
+
+170
+00:13:43,340 --> 00:13:45,000
+Khi nạn nhân thực hiện bắt tay TLS để thiết lập kết nối HTTPS,
+
+171
+00:13:45,219 --> 00:13:49,659
+kẻ tấn công nghe lén và phát hiện ra giá trị Nonce bị dùng lại, từ đó hắn có thể giải mã được lưu lượng và xem toàn bộ dữ liệu phiên.
+
+172
+00:13:49,669 --> 00:13:56,270
+Vấn đề này cũng sẽ xuất hiện lại khi chúng ta học về mạng không dây (Wireless).
+
+173
+00:13:56,280 --> 00:13:58,390
+Các bạn có thể tìm hiểu thêm xem những cuộc tấn công nào khác cũng khai thác lỗi tái sử dụng Nonce nhé.
+
+174
+00:13:58,679 --> 00:14:04,859
+Đó là nội dung của Forbidden Attack.
+
+175
+00:14:04,869 --> 00:14:07,039
+Kỹ thuật tiếp theo là Session Donation (Quyên tặng phiên).
+
+176
+00:14:07,359 --> 00:14:09,460
+Đây là một dạng tấn công mà kẻ tấn công đăng nhập tài khoản của chính mình lên dịch vụ,
+
+177
+00:14:09,469 --> 00:14:13,460
+lấy Session ID hợp lệ, rồi "tặng" Session ID này cho nạn nhân qua một link bẫy.
+
+178
+00:14:13,469 --> 00:14:19,030
+Nạn nhân bấm vào và nhập thông tin cá nhân, thẻ ngân hàng vào đó,
+
+179
+00:14:19,190 --> 00:14:22,440
+và kẻ tấn công chỉ việc đăng nhập lại phiên của mình là xem được hết thông tin nạn nhân vừa điền!
+
+180
+00:14:22,710 --> 00:14:27,210
+Bây giờ chúng ta sẽ bước sang phần tiếp theo.
+
+181
+00:14:27,520 --> 00:14:31,369
+Chúng ta sẽ tìm hiểu về Session Hijacking ở tầng mạng.
+
+182
+00:14:32,059 --> 00:14:38,000
+Hãy cùng xem xét kỹ lưỡng các kỹ thuật tầng mạng này.
+
+183
+00:14:38,010 --> 00:14:41,880
+Các bạn hãy chú ý theo dõi nhé.
+
+184
+00:14:42,799 --> 00:14:45,460
+Vâng.
+
+185
+00:14:46,049 --> 00:14:48,979
+Được rồi.
+
+186
+00:14:49,510 --> 00:14:53,619
+Chúng ta tiếp tục với phần tiếp theo.
+
+187
+00:14:53,909 --> 00:14:59,059
+Hãy nhìn vào slide hiển thị.
+
+188
+00:14:59,070 --> 00:15:02,869
+Đó là những điểm mấu chốt.
+
+189
+00:15:02,880 --> 00:15:05,530
+Và tiếp tục nào.
+
+190
+00:15:05,539 --> 00:15:07,500
+Được rồi.
+
+191
+00:15:07,820 --> 00:15:12,989
+Như vậy chúng ta đã xem xét xong phần tầng ứng dụng.
+
+192
+00:15:13,000 --> 00:15:14,369
+Và bây giờ hãy bước sang phần ba.
+
+193
+00:15:14,739 --> 00:15:18,320
+Mục tiêu số 3 của chúng ta.
+
+194
+00:15:18,330 --> 00:15:22,190
+Đó là Network Level Session Hijacking.
+
+195
+00:15:22,979 --> 00:15:28,719
+Hãy cùng tìm hiểu cách thức tấn công ở tầng mạng.
+
+196
+00:15:28,729 --> 00:15:35,690
+Nơi kẻ tấn công thao túng các gói tin TCP/IP, ARP và ICMP.
+
+197
+00:15:35,809 --> 00:15:39,479
+Để giành quyền kiểm soát đường truyền.
+
+198
+00:15:39,489 --> 00:15:45,000
+Hãy cùng xem chi tiết nhé.
+
+199
+00:15:45,369 --> 00:15:52,349
+Bắt đầu với phần này nào.
+
+200
+00:15:52,500 --> 00:15:55,030
+Được rồi.
+
+201
+00:15:55,880 --> 00:15:58,630
+Được rồi, một dạng khác là Session Donation (Quyên tặng phiên).
+
+202
+00:15:58,640 --> 00:16:05,409
+Đây là dạng tấn công mà kẻ tấn công cung cấp cho nạn nhân
+
+203
+00:16:05,650 --> 00:16:09,549
+thông tin xác thực phiên (Credential), để rồi bất cứ nơi nào nạn nhân truy cập,
+
+204
+00:16:09,559 --> 00:16:12,539
+kẻ tấn công đều có quyền truy cập vào tài nguyên đó.
+
+205
+00:16:12,900 --> 00:16:17,159
+Điều đầu tiên kẻ tấn công làm là:
+
+206
+00:16:17,369 --> 00:16:22,559
+Đăng nhập vào một dịch vụ để thiết lập một phiên làm việc hoàn toàn hợp lệ.
+
+207
+00:16:22,570 --> 00:16:25,419
+Hắn có mặt ở đó, phiên hoàn toàn hợp lệ.
+
+208
+00:16:25,429 --> 00:16:26,520
+Hắn nhận được từ máy chủ một Security ID / Session ID chính thức.
+
+209
+00:16:26,880 --> 00:16:32,250
+Bây giờ khi đã có Session ID này, hắn sẽ tỏ ra rất thân thiện và tốt bụng.
+
+210
+00:16:32,590 --> 00:16:38,479
+Người tốt bụng thì làm gì? Họ "tặng quà". Hắn sẽ "tặng" Session ID này cho nạn nhân.
+
+211
+00:16:38,489 --> 00:16:41,359
+Hắn gửi một liên kết dụ dỗ, nạn nhân nhấp vào link đó.
+
+212
+00:16:41,799 --> 00:16:47,929
+Chuyện gì xảy ra tiếp theo? Nạn nhân truy cập vào, nhập thông tin cá nhân và lưu lại.
+
+213
+00:16:48,270 --> 00:16:51,140
+Và bây giờ kẻ tấn công chỉ việc đăng nhập vào phiên của chính mình là lấy được toàn bộ thông tin mà nạn nhân vừa nhập vào!
+
+214
+00:16:51,150 --> 00:16:55,559
+Hắn làm cho việc nạn nhân đi đâu qua link bẫy đó đều bị thu thập dữ liệu.
+
+215
+00:16:55,570 --> 00:16:58,799
+Chào mừng các bạn đến với Mục 3: Chiếm quyền điều khiển phiên ở tầng mạng (Network Level Hijacking).
+
+216
+00:16:59,169 --> 00:17:04,439
+Chúng ta đã tìm hiểu xong tầng ứng dụng, bây giờ sẽ tìm hiểu sang tầng mạng.
+
+217
+00:17:04,449 --> 00:17:08,319
+Ở tầng mạng, chúng ta tập trung chủ yếu vào các giao thức tầng giao vận và mạng.
+
+218
+00:17:08,369 --> 00:17:12,369
+Có một số kỹ thuật chính: Blind UDP, TCP/IP Hijacking,
+
+219
+00:17:12,380 --> 00:17:19,119
+RST Hijacking (sử dụng cờ Reset của TCP), Man-in-the-Middle (MITM),
+
+220
+00:17:26,718 --> 00:17:31,269
+bắt gói tin (Packet Sniffers), IP Spoofing và Source Routing (Định tuyến nguồn).
+
+221
+00:17:31,418 --> 00:17:36,418
+Hãy cùng xem kỹ thuật đầu tiên: TCP/IP Hijacking là gì?
+
+222
+00:17:36,428 --> 00:17:43,180
+Điều này chắc hẳn rất quen thuộc với bạn vì chúng ta đã nói đi nói lại nhiều lần.
+
+223
+00:17:43,189 --> 00:17:47,000
+Đây là quá trình bắt tay 3 bước TCP (3-way handshake). Sau cú bắt tay,
+
+224
+00:17:47,010 --> 00:17:50,800
+quá trình đánh số thứ tự (Sequencing) và xác nhận (Acknowledging) diễn ra liên tục khi dữ liệu được truyền tải.
+
+225
+00:17:50,810 --> 00:17:56,079
+Nhưng ở giữa, có một kẻ tấn công đang rình rập.
+
+226
+00:17:57,089 --> 00:18:00,709
+Trước khi người dùng gửi gói tin tiếp theo, kẻ tấn công dùng phần mềm bắt gói tin
+
+227
+00:18:00,719 --> 00:18:07,650
+sẽ dự đoán số Sequence Number và Session ID tiếp theo, rồi nhảy vào cướp luồng giao tiếp đó.
+
+228
+00:18:07,660 --> 00:18:08,770
+Một phương pháp khác là Source Routing (Định tuyến nguồn).
+
+229
+00:18:09,079 --> 00:18:10,199
+Trong Source Routing, nếu kẻ tấn công không thích tuyến đường đi mặc định của gói tin qua router,
+
+230
+00:18:10,599 --> 00:18:15,650
+hắn có thể chỉ định một đường đi khác.
+
+231
+00:18:15,829 --> 00:18:19,209
+Kẻ tấn công mạo danh IP của máy chủ hợp lệ để thiết lập phiên,
+
+232
+00:18:19,219 --> 00:18:22,219
+rồi bơm các gói tin giả mạo vào server, dự đoán Sequence Number
+
+233
+00:18:22,229 --> 00:18:27,510
+và ép gói tin đi qua máy của mình đến IP đích.
+
+234
+00:18:27,520 --> 00:18:29,709
+Tiếp theo là RST Hijacking (Chiếm quyền bằng cờ Reset).
+
+235
+00:18:29,930 --> 00:18:34,949
+RST là một cờ (flag) trong tiêu đề gói tin TCP. Sau cú bắt tay 3 bước,
+
+236
+00:18:35,099 --> 00:18:41,989
+bất kỳ lúc nào nếu nhận được cờ RST, kết nối sẽ bị hủy bỏ (reset).
+
+237
+00:18:42,000 --> 00:18:46,800
+Kẻ tấn công thực hiện kỹ thuật chế tạo gói tin (Packet Crafting),
+
+238
+00:18:46,810 --> 00:18:52,339
+sử dụng các công cụ như Colasoft Packet Builder để tạo ra gói tin RST giả mạo.
+
+239
+00:18:52,349 --> 00:18:55,810
+Khi gói RST này được gửi đi, nó lập tức ngắt đứt kết nối của nạn nhân.
+
+240
+00:18:55,819 --> 00:18:59,329
+Kẻ tấn công theo dõi luồng giao tiếp bằng Wireshark,
+
+241
+00:18:59,339 --> 00:19:02,560
+xem địa chỉ IP nguồn, IP đích, Sequence Number và Acknowledgment Number.
+
+242
+00:19:02,569 --> 00:19:09,040
+Hắn mạo danh IP của máy chủ, dự đoán số Ack tiếp theo, gửi gói RST để ngắt nạn nhân
+
+243
+00:19:09,410 --> 00:19:13,510
+và thế chỗ để tiếp quản kết nối đó.
+
+244
+00:19:13,750 --> 00:19:17,199
+Tất nhiên việc này được phần mềm tự động hóa thực hiện trong tích tắc chứ không phải làm thủ công.
+
+245
+00:19:17,439 --> 00:19:24,189
+Tiếp theo là Blind Hijacking (Chiếm quyền "mù") và UDP Hijacking.
+
+246
+00:19:24,199 --> 00:19:26,810
+Chúng ta cũng sẽ gặp các kiểu tấn công "mù" khi học về SQL Injection (Blind SQLi).
+
+247
+00:19:26,969 --> 00:19:32,030
+Tấn công mù (Blind) có nghĩa là bạn không nhìn thấy trực tiếp phản hồi từ thiết bị mục tiêu.
+
+248
+00:19:32,040 --> 00:19:35,609
+Kẻ tấn công chặn request, gửi một phản hồi chế tạo sẵn lên server,
+
+249
+00:19:35,619 --> 00:19:42,400
+nhưng server lại trả phản hồi về cho nạn nhân chứ không trả cho kẻ tấn công.
+
+250
+00:19:42,410 --> 00:19:47,650
+Vì vậy kẻ tấn công phải quan sát các hiệu ứng phụ (side-effects) để suy đoán kết quả.
+
+251
+00:19:48,439 --> 00:19:55,089
+Còn đối với UDP Hijacking thì dễ thực hiện hơn nhiều so với TCP,
+
+252
+00:19:55,099 --> 00:20:00,300
+bởi vì UDP là giao thức phi kết nối, không có Sequence Number và không có xác nhận Acknowledgment.
+
+253
+00:20:00,400 --> 00:20:02,069
+Kẻ tấn công chỉ cần bắt gói UDP request và gửi giả mạo phản hồi nhanh hơn server thật một chút
+
+254
+00:20:02,400 --> 00:20:05,260
+là client sẽ nhận dữ liệu giả của kẻ tấn công ngay.
+
+255
+00:20:05,510 --> 00:20:11,589
+Tiếp theo là kỹ thuật tấn công Man-in-the-Middle kết hợp ICMP Spoofing và ARP Spoofing.
+
+256
+00:20:11,630 --> 00:20:16,180
+Kẻ tấn công dùng công cụ bắt gói tin, biến máy mình thành cầu nối trung gian giữa client và server,
+
+257
+00:20:16,449 --> 00:20:21,469
+thay đổi Default Gateway trên máy client và chuyển hướng toàn bộ gói tin qua máy kẻ tấn công.
+
+258
+00:20:21,579 --> 00:20:25,439
+ICMP là giao thức dùng để gửi các thông báo lỗi mạng.
+
+259
+00:20:25,619 --> 00:20:30,880
+Nếu bạn gửi thông báo lỗi ICMP giả mạo phù hợp, bạn có thể khiến máy mục tiêu thay đổi hành vi định tuyến.
+
+260
+00:20:30,890 --> 00:20:34,579
+Ví dụ như gói ICMP Redirect.
+
+261
+00:20:34,589 --> 00:20:39,310
+Và kết hợp với ARP Spoofing (Đầu độc bảng phân giải địa chỉ MAC-IP),
+
+262
+00:20:39,319 --> 00:20:42,310
+kẻ tấn công có thể dễ dàng chen vào giữa đường truyền và chiếm trọn luồng dữ liệu.
+
+263
+00:20:42,319 --> 00:20:48,660
+Một kỹ thuật đáng chú ý khác là PetitPotam.
+
+264
+00:20:48,670 --> 00:20:52,069
+PetitPotam là cuộc tấn công nhằm vào Domain Controller của mạng Windows Active Directory.
+
+265
+00:20:52,550 --> 00:20:55,790
+Nó khai thác API giao thức mã hóa tệp từ xa MS-EFSRPC của Microsoft,
+
+266
+00:20:55,910 --> 00:21:01,420
+thực hiện chuyển tiếp xác thực NTLM (NTLM Relay Attack).
+
+267
+00:21:01,430 --> 00:21:06,260
+Kẻ tấn công ép Domain Controller gửi xác thực NTLM về máy mình,
+
+268
+00:21:06,270 --> 00:21:09,699
+sau đó dùng nó yêu cầu cấp chứng chỉ số từ Active Directory Certificate Services (AD CS)
+
+269
+00:21:09,790 --> 00:21:14,959
+để chiếm trọn quyền Domain Admin cao nhất!
+
+270
+00:21:14,969 --> 00:21:18,199
+Bây giờ, chúng ta dùng những công cụ nào để thực hiện các cuộc tấn công này?
+
+271
+00:21:18,209 --> 00:21:23,180
+Bởi vì trong thực tế, các gói tin bay qua mạng quá nhanh, con người không thể quan sát bằng mắt thường.
+
+272
+00:21:23,189 --> 00:21:28,550
+Công cụ đầu tiên là Hetty. Hetty hỗ trợ tấn công Machine-in-the-Middle rất tốt và liên tục được cập nhật.
+
+273
+00:21:28,560 --> 00:21:34,819
+Công cụ tiếp theo là Caido. Caido là một bộ công cụ kiểm thử bảo mật gọn nhẹ để chặn bắt HTTP Request.
+
+274
+00:21:34,829 --> 00:21:36,569
+Chúng ta còn có Bettercap và Ettercap, hai công cụ cực mạnh cho tấn công MITM và bắt gói tin mạng.
+
+275
+00:21:36,770 --> 00:21:43,390
+Một công cụ rất nổi tiếng khác là OWASP ZAP (Zed Attack Proxy).
+
+276
+00:21:43,400 --> 00:21:46,790
+ZAP hoàn toàn miễn phí, mã nguồn mở, hoạt động như một proxy trung gian giúp bạn phân tích từng header, cookie và nội dung HTML.
+
+277
+00:21:47,319 --> 00:21:51,859
+Chúng ta cũng có SSLstrip. SSLstrip hoạt động rất thú vị:
+
+278
+00:21:51,869 --> 00:21:55,150
+Khi người dùng muốn truy cập trang web qua HTTPS, SSLstrip sẽ đứng giữa và nói với server:
+
+279
+00:21:55,160 --> 00:22:00,670
+"Tôi không hỗ trợ HTTPS, hãy hạ cấp xuống HTTP thường đi".
+
+280
+00:22:00,709 --> 00:22:05,699
+Và server đồng ý hạ cấp xuống HTTP, giúp kẻ tấn công nghe lén toàn bộ dữ liệu ở dạng văn bản rõ không mã hóa!
+
+281
+00:22:05,949 --> 00:22:10,849
+Và không thể không nhắc đến Burp Suite - công cụ kiểm thử web hàng đầu hiện nay của hãng PortSwigger.
+
+282
+00:22:10,859 --> 00:22:13,260
+Burp Suite có bản Community miễn phí và bản Pro trả phí với đầy đủ sức mạnh vượt trội.
+
+283
+00:22:13,270 --> 00:22:16,729
+Đó là những công cụ tuyệt vời phục vụ Session Hijacking.
+
+284
+00:22:16,739 --> 00:22:22,089
+Bây giờ chúng ta sẽ bước sang phần cuối cùng: Các biện pháp phòng thủ (Countermeasures).
+
+285
+00:22:22,099 --> 00:22:24,630
+Làm thế nào để bảo vệ hệ thống không bị chiếm quyền phiên?
+
+286
+00:22:24,640 --> 00:22:25,810
+Chúng ta sẽ cùng tìm hiểu ngay sau đây.
+
+287
+00:22:26,209 --> 00:22:31,719
+Vâng.
+
+288
+00:22:31,729 --> 00:22:35,390
+Hãy cùng xem xét các giải pháp phòng vệ.
+
+289
+00:22:35,609 --> 00:22:40,910
+Được rồi.
+
+290
+00:22:40,920 --> 00:22:44,170
+Tiếp tục nào.
+
+291
+00:22:44,180 --> 00:22:45,790
+Hãy chú ý theo dõi phần phòng thủ này nhé.
+
+292
+00:22:46,109 --> 00:22:48,839
+Đây là phần rất quan trọng trong bất kỳ bài thi hay đồ án an ninh mạng nào.
+
+293
+00:22:48,900 --> 00:22:52,630
+Các biện pháp phòng chống Session Hijacking.
+
+294
+00:22:52,640 --> 00:22:53,930
+Được rồi.
+
+295
+00:22:54,170 --> 00:23:00,619
+Hãy nhìn vào slide hiển thị.
+
+296
+00:23:01,000 --> 00:23:04,329
+Đó là các cơ chế cốt lõi.
+
+297
+00:23:04,339 --> 00:23:06,579
+Bao gồm mã hóa dữ liệu đường truyền.
+
+298
+00:23:06,969 --> 00:23:12,579
+Và xác thực an toàn.
+
+299
+00:23:12,709 --> 00:23:18,949
+Cùng xem xét chi tiết nhé.
+
+300
+00:23:19,319 --> 00:23:26,280
+Bắt đầu nào.
+
+301
+00:23:26,290 --> 00:23:28,939
+Chúng ta gửi các thông điệp báo lỗi, đó chính là chức năng của ICMP.
+
+302
+00:23:29,099 --> 00:23:35,859
+Và nếu bạn gửi đúng loại thông điệp báo lỗi, bạn có thể khiến máy tính nhận gói tin đó hành xử khác đi.
+
+303
+00:23:35,869 --> 00:23:38,290
+Và đó chính là những gì chúng ta đang làm ở đây.
+
+304
+00:23:38,680 --> 00:23:41,140
+Hãy hình dung một phiên bản rất đơn giản của việc này:
+
+305
+00:23:41,150 --> 00:23:47,709
+Chúng ta có ICMP Echo Request và Echo Reply (lệnh ping).
+
+306
+00:23:47,719 --> 00:23:51,819
+Nếu tôi gửi lệnh ping và không có phản hồi, máy của tôi sẽ phản ứng khác so với khi có phản hồi.
+
+307
+00:23:51,829 --> 00:23:57,069
+Vì vậy chúng ta có thể giả mạo gói tin ICMP để thay đổi hành vi phản hồi của máy mục tiêu.
+
+308
+00:23:57,339 --> 00:24:02,119
+Tiếp theo là ARP Spoofing (Mạo danh giao thức phân giải địa chỉ ARP).
+
+309
+00:24:02,130 --> 00:24:05,339
+Cuộc tấn công này diễn ra ở tầng liên kết dữ liệu / mạng, làm thay đổi bảng phản hồi ARP.
+
+310
+00:24:05,439 --> 00:24:11,790
+Chúng ta đã thấy điều này trong module trước và sẽ gặp lại nó.
+
+311
+00:24:11,800 --> 00:24:15,564
+Cả hai kỹ thuật này đều có thể bị giả mạo để kẻ tấn công chen vào giữa cuộc hội thoại
+
+312
+00:24:15,655 --> 00:24:21,814
+và chiếm quyền điều khiển đường truyền giữa hai máy tính.
+
+313
+00:24:21,824 --> 00:24:27,685
+Một cuộc tấn công khác rất nguy hiểm mang tên PetitPotam.
+
+314
+00:24:27,939 --> 00:24:32,699
+PetitPotam là cuộc tấn công nhằm trực tiếp vào Domain Controller (Máy chủ quản trị miền Windows).
+
+315
+00:24:32,709 --> 00:24:35,650
+Công nghệ mà nó nhắm vào là API mã hóa tệp từ xa MS-EFSRPC của Microsoft.
+
+316
+00:24:35,660 --> 00:24:42,250
+Và một điều tôi muốn bạn lưu ý là nó thực hiện chuyển tiếp xác thực NTLM (NTLM Relay).
+
+317
+00:24:42,260 --> 00:24:48,160
+Việc sử dụng giao thức xác thực NTLM tiềm ẩn rất nhiều lỗ hổng tấn công.
+
+318
+00:24:48,170 --> 00:24:51,089
+Trong một số phiên bản của cuộc tấn công này, nó thậm chí khai thác NTLMv1.
+
+319
+00:24:51,099 --> 00:24:54,839
+Một thành phần nữa mà cuộc tấn công này lợi dụng là máy chủ chứng chỉ số (Certificate Server - AD CS).
+
+320
+00:24:54,849 --> 00:24:57,560
+Mục tiêu của PetitPotam là đoạt lấy quyền quản trị cao nhất (Domain Admin).
+
+321
+00:24:57,839 --> 00:25:00,500
+Hãy nhìn vào quy trình hoạt động: Chúng ta có người dùng hợp lệ xác thực bằng NTLM.
+
+322
+00:25:00,510 --> 00:25:07,420
+Kẻ tấn công ép máy chủ gửi yêu cầu xác thực NTLM qua giao thức SMB về máy hắn.
+
+323
+00:25:08,010 --> 00:25:12,729
+Hắn chuyển tiếp phản hồi xác thực NTLM này lên Certificate Server để yêu cầu cấp chứng chỉ số hợp lệ.
+
+324
+00:25:12,739 --> 00:25:18,829
+Và với chứng chỉ số đó, kẻ tấn công lập tức có được đặc quyền Domain Admin!
+
+325
+00:25:19,160 --> 00:25:24,489
+Đó là phương thức tấn công PetitPotam.
+
+326
+00:25:24,689 --> 00:25:29,089
+Bây giờ, chúng ta sẽ nói về các công cụ (Tools).
+
+327
+00:25:29,099 --> 00:25:33,150
+Như tôi đã nói, các cuộc tấn công chiếm quyền phiên không thể thực hiện thủ công bằng mắt thường vì dữ liệu truyền quá nhanh.
+
+328
+00:25:33,229 --> 00:25:38,430
+Chúng ta cần các công cụ hỗ trợ Session Hijacking chuyên dụng.
+
+329
+00:25:38,439 --> 00:25:43,780
+Hetty là một trong số đó. Hetty là công cụ tuyệt vời để thực hiện Machine-in-the-Middle Hijack,
+
+330
+00:25:43,790 --> 00:25:46,729
+rất gọn nhẹ và được cập nhật thường xuyên.
+
+331
+00:25:46,819 --> 00:25:52,959
+Một công cụ khác là Caido. Caido là một bộ công cụ kiểm toán và pentest web để chặn bắt và can thiệp HTTP Request.
+
+332
+00:25:53,160 --> 00:25:56,949
+Ngoài ra chúng ta có Bettercap và Ettercap, hai công cụ kinh điển cho các cuộc tấn công Man-in-the-Middle.
+
+333
+00:25:56,959 --> 00:26:00,589
+Một công cụ rất phổ biến khác mà bạn cần nắm vững là OWASP ZAP (Zed Attack Proxy).
+
+334
+00:26:00,599 --> 00:26:05,630
+Nó hoàn toàn miễn phí, mã nguồn mở, hoạt động như một proxy trung gian giữa client và server.
+
+335
+00:26:05,810 --> 00:26:10,339
+Bạn có thể quan sát mọi luồng thông tin đi qua, đọc header, cookie và nội dung HTML.
+
+336
+00:26:10,349 --> 00:26:12,739
+Chúng ta cũng có SSLstrip. SSLstrip là một công cụ rất thú vị:
+
+337
+00:26:13,020 --> 00:26:19,630
+Nó chặn kết nối HTTPS của nạn nhân và yêu cầu máy chủ web hạ cấp kết nối xuống HTTP thông thường.
+
+338
+00:26:19,640 --> 00:26:24,089
+Và khi chuyển sang HTTP không mã hóa, kẻ tấn công có thể dễ dàng nghe lén và cướp phiên.
+
+339
+00:26:24,099 --> 00:26:27,790
+Và một công cụ kiểm thử web hàng đầu hiện nay chính là Burp Suite của hãng PortSwigger.
+
+340
+00:26:27,800 --> 00:26:34,140
+Burp Suite có nhiều tính năng vượt trội hơn so với OWASP ZAP.
+
+341
+00:26:34,150 --> 00:26:35,550
+Bản Community thì miễn phí, còn bản Professional đầy đủ tính năng thì cần trả phí.
+
+342
+00:26:35,770 --> 00:26:40,189
+Bây giờ chúng ta bước vào phần cuối cùng: Mục tiêu 04 - Giải thích các biện pháp phòng chống Session Hijacking.
+
+343
+00:26:40,199 --> 00:26:46,439
+Làm sao để bảo vệ hệ thống không bị chiếm quyền phiên?
+
+344
+00:26:46,449 --> 00:26:49,109
+Yếu tố cốt lõi và quan trọng nhất xuất hiện ở khắp mọi nơi chính là: Mã hóa toàn diện (Ubiquitous Encryption).
+
+345
+00:26:49,119 --> 00:26:52,000
+Ở mục số 1, chúng ta thấy giao thức SSH.
+
+346
+00:26:52,010 --> 00:26:58,349
+Ở mục số 4, chúng ta thấy cơ chế mã hóa và phòng thủ theo chiều sâu (Defense-in-Depth).
+
+347
+00:26:58,359 --> 00:27:04,510
+Chúng ta thấy VPN mã hóa đường truyền. Toàn bộ dữ liệu đều được mã hóa.
+
+348
+00:27:04,520 --> 00:27:05,829
+Yếu tố tiếp theo là quản lý danh tính và xác thực toàn diện (Ubiquitous IAM & Authentication).
+
+349
+00:27:06,219 --> 00:27:10,000
+Chúng ta có tính năng Đăng xuất (Logout) đúng chuẩn.
+
+350
+00:27:10,010 --> 00:27:13,510
+Khi người dùng bấm Đăng xuất, phiên làm việc phải được hủy bỏ hoàn toàn trên server.
+
+351
+00:27:13,520 --> 00:27:17,339
+Chúng ta có giao thức Kerberos để xác thực an toàn.
+
+352
+00:27:17,689 --> 00:27:24,660
+Sau đó là các giải pháp làm cho phiên làm việc khó bị tấn công hơn:
+
+353
+00:27:24,670 --> 00:27:28,439
+Thiết lập thời gian hết hạn phiên (Session Timeout) và làm cho Session Token ngẫu nhiên, không thể đoán trước (High entropy).
+
+354
+00:27:28,449 --> 00:27:33,959
+Đồng thời sử dụng các công cụ phát hiện xâm nhập và chiếm quyền phiên:
+
+355
+00:27:33,969 --> 00:27:37,280
+Hệ thống SIEM như AlienVault USM, SolarWinds Security Event Manager.
+
+356
+00:27:37,290 --> 00:27:42,640
+Công cụ bắt gói tin Wireshark để phát hiện dấu hiệu bất thường.
+
+357
+00:27:43,609 --> 00:27:45,489
+Hệ thống ngăn ngừa xâm nhập IPS như Check Point Quantum, IBM QRadar IPS.
+
+358
+00:27:45,500 --> 00:27:48,819
+Đó là những công cụ phát hiện và phòng chống hiệu quả.
+
+359
+00:27:48,959 --> 00:27:55,859
+Bây giờ chúng ta sẽ đi sâu vào các kỹ thuật ngăn chặn cụ thể.
+
+360
+00:27:55,869 --> 00:28:00,040
+Cùng xem xét tiếp nhé.
+
+361
+00:28:00,050 --> 00:28:05,109
+Vâng.
+
+362
+00:28:05,119 --> 00:28:12,040
+Được rồi.
+
+363
+00:28:12,050 --> 00:28:13,910
+Tiếp tục nào.
+
+364
+00:28:13,920 --> 00:28:20,689
+Hãy chú ý theo dõi các giải pháp này.
+
+365
+00:28:20,699 --> 00:28:23,790
+Các cơ chế bảo vệ phiên làm việc.
+
+366
+00:28:23,800 --> 00:28:30,229
+Bao gồm HSTS và Token Binding.
+
+367
+00:28:30,239 --> 00:28:33,949
+Đó là những công nghệ rất quan trọng.
+
+368
+00:28:33,959 --> 00:28:39,310
+Cùng tìm hiểu chi tiết nhé.
+
+369
+00:28:39,319 --> 00:28:44,439
+Được rồi.
+
+370
+00:28:44,449 --> 00:28:49,910
+Hãy xem xét tiếp nào.
+
+371
+00:28:50,020 --> 00:28:56,130
+Vâng.
+
+372
+00:28:56,150 --> 00:29:01,910
+Tiếp tục nào.
+
+373
+00:29:01,920 --> 00:29:05,510
+Được rồi.
+
+374
+00:29:05,650 --> 00:29:09,939
+Bắt đầu tìm hiểu về HSTS và Token Binding.
+
+375
+00:29:09,949 --> 00:29:13,589
+Những công nghệ bảo vệ phiên tối tân.
+
+376
+00:29:13,800 --> 00:29:20,290
+Hãy xem chúng hoạt động ra sao.
+
+377
+00:29:20,300 --> 00:29:23,359
+Được rồi.
+
+378
+00:29:23,369 --> 00:29:25,479
+Tiếp tục nào.
+
+379
+00:29:32,520 --> 00:29:38,989
+Chúng ta đang ở phần các giải pháp phòng thủ.
+
+380
+00:29:39,099 --> 00:29:42,900
+Giải thích các biện pháp đối phó với Session Hijacking.
+
+381
+00:29:42,910 --> 00:29:47,329
+Bạn không muốn bị cướp phiên, bạn cần làm gì?
+
+382
+00:29:47,339 --> 00:29:49,060
+Hãy cùng xem.
+
+383
+00:29:49,880 --> 00:29:52,660
+Các giải pháp bảo vệ cốt lõi.
+
+384
+00:29:52,670 --> 00:29:58,189
+Trước hết là mã hóa toàn diện (Ubiquitous Encryption).
+
+385
+00:29:58,439 --> 00:30:03,520
+Số 1: dùng SSH thay cho Telnet.
+
+386
+00:30:03,530 --> 00:30:10,500
+Số 4: mã hóa dữ liệu và phòng thủ theo chiều sâu.
+
+387
+00:30:10,510 --> 00:30:16,260
+Dùng VPN để mã hóa đường truyền từ xa.
+
+388
+00:30:16,439 --> 00:30:18,140
+Tiếp theo là cơ chế xác thực toàn diện.
+
+389
+00:30:18,369 --> 00:30:23,099
+Cần có chức năng Đăng xuất (Logout) rõ ràng.
+
+390
+00:30:23,109 --> 00:30:25,829
+Hủy bỏ hoàn toàn phiên trên server khi người dùng thoát.
+
+391
+00:30:25,839 --> 00:30:27,430
+Đảm bảo phiên không còn tồn tại sau khi đăng xuất.
+
+392
+00:30:27,859 --> 00:30:32,189
+Sử dụng giao thức Kerberos để xác thực an toàn.
+
+393
+00:30:32,540 --> 00:30:36,060
+Và tiếp theo là làm cho phiên làm việc khó bị tấn công hơn:
+
+394
+00:30:36,069 --> 00:30:42,489
+Thiết lập thời gian chờ hết hạn phiên (Session Timeout).
+
+395
+00:30:42,500 --> 00:30:49,199
+Và sinh ra Session Token có độ ngẫu nhiên cao, không thể dự đoán được.
+
+396
+00:30:49,510 --> 00:30:55,910
+Sử dụng các công cụ giám sát và phát hiện xâm nhập.
+
+397
+00:30:55,959 --> 00:31:00,114
+Hệ thống AlienVault USM trên đám mây và on-premise.
+
+398
+00:31:00,244 --> 00:31:06,064
+Giám sát và phát hiện các dấu hiệu chiếm quyền phiên.
+
+399
+00:31:06,074 --> 00:31:09,045
+Công cụ phân tích gói tin Wireshark.
+
+400
+00:31:09,055 --> 00:31:13,074
+Công cụ mà chúng ta đã thực hành rất nhiều trong bài lab.
+
+401
+00:31:13,084 --> 00:31:18,935
+Chúng ta đã dùng Wireshark rất nhiều lần trong các bài thực hành, đây là công cụ mà bạn cần phải thật thành thạo.
+
+402
+00:31:18,944 --> 00:31:22,584
+Tiếp theo là các hệ thống ngăn ngừa xâm nhập (IPS) từ Check Point như Quantum IPS.
+
+403
+00:31:22,829 --> 00:31:27,670
+Hệ thống SIEM từ SolarWinds: Security Event Manager.
+
+404
+00:31:27,819 --> 00:31:30,270
+Hệ thống Network IPS từ IBM.
+
+405
+00:31:30,280 --> 00:31:37,099
+Đó là những công cụ giúp chúng ta phát hiện và ngăn chặn xâm nhập mạng hiệu quả.
+
+406
+00:31:37,109 --> 00:31:39,160
+Mục tiêu tiếp theo là làm sao để ngăn chặn hoàn toàn việc chiếm quyền phiên?
+
+407
+00:31:39,920 --> 00:31:43,910
+Hãy cùng xem xét một số phương pháp kỹ thuật tiên tiến:
+
+408
+00:31:44,069 --> 00:31:48,619
+Mục tiêu của tất cả các giải pháp này là đảm bảo rằng: Khi một trình duyệt, một người dùng
+
+409
+00:31:48,630 --> 00:31:54,739
+đã thiết lập một kết nối hợp lệ, thì không một ai khác, không một thực thể nào khác
+
+410
+00:31:54,859 --> 00:32:01,699
+có thể mạo danh hoặc sử dụng lại kết nối đó được nữa!
+
+411
+00:32:01,790 --> 00:32:07,900
+Giải pháp đầu tiên là HSTS (HTTP Strict Transport Security).
+
+412
+00:32:08,359 --> 00:32:14,640
+HSTS là cơ chế bảo mật nghiêm ngặt trên tầng truyền tải HTTP.
+
+413
+00:32:14,699 --> 00:32:21,239
+Nó ép buộc trình duyệt chỉ được phép giao tiếp với web server thông qua giao thức mã hóa HTTPS.
+
+414
+00:32:21,250 --> 00:32:26,550
+Nếu kẻ tấn công cố dùng SSLstrip để hạ cấp kết nối xuống HTTP, trình duyệt có HSTS sẽ lập tức chặn lại và từ chối kết nối!
+
+415
+00:32:26,560 --> 00:32:32,900
+Giải pháp tiếp theo là Token Binding (Ràng buộc mã định danh).
+
+416
+00:32:32,910 --> 00:32:35,979
+Với Token Binding, khi người dùng đăng nhập vào ứng dụng và nhận Cookie/Session ID,
+
+417
+00:32:36,160 --> 00:32:40,189
+Session Token này sẽ được gắn chặt bằng mật mã với phiên TLS của chính trình duyệt đó.
+
+418
+00:32:40,199 --> 00:32:46,890
+Vì Token đã bị ràng buộc vào trình duyệt gốc, nên cho dù kẻ tấn công có nghe lén và đánh cắp được chuỗi Cookie đó,
+
+419
+00:32:46,900 --> 00:32:51,770
+khi hắn dán sang trình duyệt trên máy của hắn thì máy chủ sẽ lập tức phát hiện khóa mật mã không khớp và từ chối ngay!
+
+420
+00:32:51,780 --> 00:32:57,079
+Kẻ tấn công hoàn toàn không thể sử dụng Cookie đánh cắp được nữa.
+
+421
+00:32:57,250 --> 00:33:00,189
+Để ngăn chặn các cuộc tấn công này, giải pháp căn bản nhất vẫn là mã hóa toàn diện (Ubiquitous Encryption).
+
+422
+00:33:01,030 --> 00:33:07,069
+Kể cả đối với dịch vụ phân giải tên miền DNS, ta có thể dùng DoH (DNS over HTTPS).
+
+423
+00:33:07,079 --> 00:33:12,020
+Từ đó ngăn chặn kẻ tấn công nghe lén các truy vấn tên miền DNS.
+
+424
+00:33:12,030 --> 00:33:16,150
+Và một giải pháp mạnh mẽ nữa là bộ giao thức IPsec (Internet Protocol Security).
+
+425
+00:33:16,160 --> 00:33:17,459
+IPsec là một bộ giao thức toàn diện thường dùng cho mạng riêng ảo VPN.
+
+426
+00:33:18,119 --> 00:33:24,974
+Nó cung cấp cả tính xác thực (Authentication) và tính bảo mật toàn vẹn (Confidentiality & Integrity).
+
+427
+00:33:24,984 --> 00:33:31,755
+IPsec hoạt động ở hai chế độ tiêu đề chính:
+
+428
+00:33:31,834 --> 00:33:34,314
+AH (Authentication Header) chịu trách nhiệm xác thực nguồn gốc và toàn vẹn gói tin.
+
+429
+00:33:34,324 --> 00:33:39,714
+Và ESP (Encapsulating Security Payload) cung cấp mã hóa toàn bộ dữ liệu gói tin.
+
+430
+00:33:39,724 --> 00:33:45,194
+ESP vừa mã hóa tải dữ liệu (payload), vừa cung cấp khả năng chống tấn công phát lại (Replay Protection).
+
+431
+00:33:45,204 --> 00:33:49,780
+Về chế độ hoạt động, IPsec có hai chế độ:
+
+432
+00:33:49,790 --> 00:33:53,969
+Chế độ Transport Mode: Tiêu đề IP gốc không bị mã hóa, gói tin có thể định tuyến bình thường trên Internet.
+
+433
+00:33:53,979 --> 00:33:57,930
+Và chế độ Tunnel Mode: Toàn bộ gói tin ban đầu (bao gồm cả IP Header cũ) đều được mã hóa và bọc bên trong một IP Header mới.
+
+434
+00:33:58,020 --> 00:34:03,944
+Tunnel Mode thường dùng để kết nối VPN Site-to-Site giữa hai Gateway hoặc Client-to-Site.
+
+435
+00:34:03,954 --> 00:34:08,614
+IPsec sử dụng các thuật toán mã hóa mạnh mẽ như AES-256, 3DES cùng hệ thống quản lý khóa chặt chẽ.
+
+436
+00:34:08,625 --> 00:34:12,754
+Khi hệ thống chạy IPsec với sự kết hợp của AH và ESP,
+
+437
+00:34:12,885 --> 00:34:16,905
+thì gần như kẻ tấn công không thể nào thực hiện được tấn công Man-in-the-Middle trên đường truyền đó.
+
+438
+00:34:17,084 --> 00:34:22,254
+Tóm lại, trong bài học này chúng ta đã tìm hiểu toàn diện về Session Hijacking:
+
+439
+00:34:22,264 --> 00:34:29,104
+Session Hijacking dẫn đến các cuộc tấn công trung gian MITM,
+
+440
+00:34:29,235 --> 00:34:31,004
+cho phép kẻ tấn công trích xuất các thông tin nhạy cảm như dữ liệu cá nhân, số thẻ tín dụng,
+
+441
+00:34:32,668 --> 00:34:38,888
+hoặc thực hiện các hành động tùy ý dưới danh nghĩa người dùng hợp lệ.
+
+442
+00:34:38,898 --> 00:34:40,128
+Và chúng ta thấy rằng hầu hết các biện pháp phòng vệ cốt lõi
+
+443
+00:34:40,648 --> 00:34:44,128
+đều dựa trên hai trụ cột vững chắc: Mã hóa (Encryption) và Xác thực (Authentication).
+
+444
+00:34:44,589 --> 00:34:50,360
+Nếu bạn áp dụng mã hóa mạnh mẽ (HTTPS/TLS) và triển khai cơ chế xác thực chặt chẽ,
+
+445
+00:34:50,719 --> 00:34:54,219
+thì nguy cơ bị tấn công chiếm quyền phiên sẽ được giảm thiểu tối đa.
+
+446
+00:34:54,229 --> 00:35:01,179
+Đó là toàn bộ kiến thức lý thuyết của Module 11 - Session Hijacking.
+
+447
+00:35:01,209 --> 00:35:04,840
+Bây giờ chúng ta sẽ cùng bước vào các bài thực hành Lab.
+
+448
+00:35:05,129 --> 00:35:10,679
+Hẹn gặp lại các bạn trong bài học tiếp theo!
+
+449
+00:35:11,350 --> 00:35:13,439
+Xin cảm ơn các bạn.
+
+450
+00:35:13,929 --> 00:35:20,300
+Chúc các bạn học tốt.
+
+451
+00:35:20,310 --> 00:35:23,090
+Vâng.
+
+452
+00:35:23,629 --> 00:35:26,699
+Tạm biệt các bạn.
+
+453
+00:35:26,969 --> 00:35:32,580
+Hẹn gặp lại.
+
+454
+00:35:32,590 --> 00:35:38,290
+Được rồi.
+
+455
+00:35:38,300 --> 00:35:44,350
+Xin chào.
+
+456
+00:35:44,439 --> 00:35:49,139
+Vâng.
+
+457
+00:35:49,149 --> 00:35:53,500
+Chào tạm biệt.
+
+458
+00:35:54,399 --> 00:35:59,860
+Hẹn gặp lại trong bài tiếp theo.
+
+459
+00:35:59,870 --> 00:36:04,290
+Được rồi.
+
+460
+00:36:04,510 --> 00:36:08,530
+Vâng.
+
+461
+00:36:08,540 --> 00:36:10,489
+Tạm biệt.
+
+462
+00:36:11,409 --> 00:36:14,669
+Hẹn gặp lại các bạn.
+
+463
+00:36:15,060 --> 00:36:19,000
+Chào các bạn.
+
+464
+00:36:19,149 --> 00:36:24,419
+Vâng.
+
+465
+00:36:24,629 --> 00:36:30,209
+Tạm biệt.
+
+466
+00:36:30,219 --> 00:36:37,030
+Được rồi.
+
+467
+00:36:37,040 --> 00:36:38,459
+Xin chào.
+
+468
+00:36:38,790 --> 00:36:45,330
+Chào các bạn.
+
+469
+00:36:46,550 --> 00:36:49,159
+Hẹn gặp lại.
+
+470
+00:36:49,600 --> 00:36:56,260
+Tạm biệt.
+
+471
+00:36:56,270 --> 00:37:02,270
+Vâng.
+
+472
+00:37:02,449 --> 00:37:06,080
+Chào các bạn.
+
+473
+00:37:06,139 --> 00:37:11,570
+Hẹn gặp lại trong module sau.
+
+474
+00:37:11,739 --> 00:37:15,729
+Xin chào.
+
+475
+00:37:15,739 --> 00:37:16,489
+Tạm biệt.
+

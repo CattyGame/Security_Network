@@ -1,0 +1,26 @@
+# ==============================================================================
+# GITIGNORE - ĐỒ ÁN AN NINH MẠNG UTH (NHÓM 22)
+# ==============================================================================
+
+# Loại trừ các file video dung lượng lớn (> 800MB - vượt quá giới hạn 100MB của GitHub)
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# Loại trừ bộ giáo trình ISO và file ZIP nén nặng (> 1GB)
+CEH v13 OCT 2024/
+*.zip
+*.iso
+*.exe
+*.msi
+
+# Dependency & Cache
+node_modules/
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Workspace temp
+.agent/
+.temp_check_repo/

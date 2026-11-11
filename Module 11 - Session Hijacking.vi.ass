@@ -1,0 +1,490 @@
+[Script Info]
+Title: Module 11 - Session Hijacking (Vietsub)
+ScriptType: v4.00+
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+PlayResX: 1920
+PlayResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Segoe UI,40,&H00FFFFFF,&H000000FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,3,8,0,2,30,30,50,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:05.80,0:00:06.26,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:00:13.90,0:00:14.90,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:00:21.32,0:00:27.82,Default,,0,0,0,,Chúng ta đang ở Module số 11, và trong module này chúng ta sẽ nói về Session Hijacking (Tấn công chiếm quyền điều khiển phiên).
+Dialogue: 0,0:00:28.07,0:00:34.88,Default,,0,0,0,,Hãy cùng bắt đầu với Session Hijacking. Chúng ta sẽ xem xét qua một số mảng nội dung khác nhau,
+Dialogue: 0,0:00:34.90,0:00:38.36,Default,,0,0,0,,bắt đầu từ các khái niệm căn bản ở mục tiêu đầu tiên.
+Dialogue: 0,0:00:38.58,0:00:44.47,Default,,0,0,0,,Sau đó, chúng ta sẽ tìm hiểu về hai phân loại chính của Session Hijacking gồm:
+Dialogue: 0,0:00:44.61,0:00:48.50,Default,,0,0,0,,ở tầng ứng dụng (Application Level) ở mục số hai, và mục số ba
+Dialogue: 0,0:00:48.52,0:00:53.04,Default,,0,0,0,,chúng ta sẽ tìm hiểu Session Hijacking ở tầng mạng (Network Level), tiếp theo sẽ xem xét
+Dialogue: 0,0:00:53.06,0:00:56.61,Default,,0,0,0,,các biện pháp phòng ngừa và đối phó phổ biến đối với Session Hijacking.
+Dialogue: 0,0:01:04.11,0:01:09.59,Default,,0,0,0,,Bây giờ hãy cùng tìm hiểu Session Hijacking là gì qua slide này.
+Dialogue: 0,0:01:09.61,0:01:13.72,Default,,0,0,0,,Bạn có thể thấy chúng ta có một kẻ tấn công (Attacker). Bạn nhận ra ngay vì anh ta mặc
+Dialogue: 0,0:01:13.73,0:01:16.41,Default,,0,0,0,,áo hoodie trùm đầu và đeo mặt nạ.
+Dialogue: 0,0:01:16.80,0:01:21.62,Default,,0,0,0,,Nhưng điều gì xảy ra nếu bạn nhìn vào luồng giao tiếp? Có một vài điều đang diễn ra
+Dialogue: 0,0:01:21.62,0:01:23.08,Default,,0,0,0,,ở đây, để tôi dùng bút dạ quang làm nổi bật lên.
+Dialogue: 0,0:01:23.25,0:01:26.30,Default,,0,0,0,,Chúng ta thấy có thông tin đăng nhập/xác thực (Credentials) được gửi đi.
+Dialogue: 0,0:01:26.56,0:01:28.90,Default,,0,0,0,,Chúng ta thấy có quá trình thiết lập phiên làm việc (Session).
+Dialogue: 0,0:01:29.25,0:01:33.23,Default,,0,0,0,,Có dữ liệu đang được gửi yêu cầu (request) và truyền tải.
+Dialogue: 0,0:01:33.56,0:01:36.36,Default,,0,0,0,,Và điều gì đang xảy ra ở phía dưới này? Kẻ tấn công này đang làm gì?
+Dialogue: 0,0:01:36.52,0:01:41.75,Default,,0,0,0,,Đang bắt gói tin (sniffing traffic). Hắn có card mạng đặt ở
+Dialogue: 0,0:01:41.76,0:01:44.83,Default,,0,0,0,,chế độ hỗn tạp (promiscuous mode) và thu thập toàn bộ thông tin đó.
+Dialogue: 0,0:01:45.08,0:01:51.55,Default,,0,0,0,,Bạn có nhận thấy điều gì còn thiếu ở đây không? Vì sao kẻ tấn công lại có thể làm được điều này?
+Dialogue: 0,0:01:51.69,0:01:53.86,Default,,0,0,0,,Đáng lẽ hắn không được phép lấy được thông tin này chứ.
+Dialogue: 0,0:01:54.34,0:01:58.30,Default,,0,0,0,,Nhưng chuyện gì đã xảy ra? Không hề có mã hóa! Và chúng ta sẽ thấy rằng
+Dialogue: 0,0:01:58.31,0:02:01.94,Default,,0,0,0,,đây chính là một trong những nguyên nhân lớn nhất khiến Session Hijacking thành công.
+Dialogue: 0,0:02:02.68,0:02:05.12,Default,,0,0,0,,Được rồi, bây giờ hãy nhìn quy trình từ dưới lên.
+Dialogue: 0,0:02:05.26,0:02:08.35,Default,,0,0,0,,Chúng ta sẽ bắt đầu từ phần dưới cùng này.
+Dialogue: 0,0:02:08.58,0:02:14.24,Default,,0,0,0,,Những gì kẻ tấn công làm là đặt mình vào vị trí mà hắn có thể
+Dialogue: 0,0:02:14.25,0:02:17.83,Default,,0,0,0,,giám sát lưu lượng mạng. Đây là kẻ tấn công ở góc dưới này,
+Dialogue: 0,0:02:18.47,0:02:25.13,Default,,0,0,0,,hắn có thể quan sát luồng giao dịch qua lại giữa mục tiêu ở đây
+Dialogue: 0,0:02:25.14,0:02:27.46,Default,,0,0,0,,và máy chủ ở đằng kia.
+Dialogue: 0,0:02:27.83,0:02:33.83,Default,,0,0,0,,Điều tiếp theo hắn làm là giám sát luồng gói tin, và đây là
+Dialogue: 0,0:02:33.85,0:02:39.69,Default,,0,0,0,,từ khóa cực kỳ quan trọng: "Dự đoán" (predict), cùng một cụm từ quan trọng nữa:
+Dialogue: 0,0:02:39.71,0:02:43.13,Default,,0,0,0,,"Số thứ tự gói tin" (sequence number). Hắn sẽ theo dõi sát sao
+Dialogue: 0,0:02:43.13,0:02:44.97,Default,,0,0,0,,số thứ tự TCP Sequence Number đó.
+Dialogue: 0,0:02:45.42,0:02:48.83,Default,,0,0,0,,Và sau đó hắn sẽ thực hiện làm mất đồng bộ (Desynchronization).
+Dialogue: 0,0:02:48.85,0:02:54.22,Default,,0,0,0,,Hắn sẽ ngắt kết nối đang nối tới máy của nạn nhân.
+Dialogue: 0,0:02:54.55,0:02:59.28,Default,,0,0,0,,Và bởi vì hắn đã dự đoán được Session ID,
+Dialogue: 0,0:02:59.47,0:03:04.13,Default,,0,0,0,,hắn có thể chiếm quyền phiên làm việc đó. Và sau khi chiếm được phiên,
+Dialogue: 0,0:03:04.14,0:03:07.25,Default,,0,0,0,,hắn sẽ làm gì tiếp theo? Bắt đầu chèn gói tin giả mạo (injecting packets). Nghĩa là sao?
+Dialogue: 0,0:03:07.27,0:03:12.17,Default,,0,0,0,,Hắn có thể làm bất cứ điều gì hắn muốn, tùy thuộc vào mức độ tiếp quản phiên.
+Dialogue: 0,0:03:12.21,0:03:17.78,Default,,0,0,0,,Và đó chính là quy trình diễn ra của một cuộc tấn công chiếm quyền điều khiển phiên.
+Dialogue: 0,0:03:18.77,0:03:21.83,Default,,0,0,0,,Về tấn công Session Hijacking,
+Dialogue: 0,0:03:22.28,0:03:27.82,Default,,0,0,0,,nó diễn ra ở một số tầng khác nhau trong mô hình OSI.
+Dialogue: 0,0:03:27.83,0:03:34.11,Default,,0,0,0,,Một khu vực là ở tầng mạng, nơi chúng ta xem xét TCP hoặc UDP ngay
+Dialogue: 0,0:03:34.11,0:03:39.57,Default,,0,0,0,,phía trên tầng mạng. Chúng ta có tầng 3 là Network, và tầng giao vận / phiên
+Dialogue: 0,0:03:39.58,0:03:44.44,Default,,0,0,0,,là tầng 4. Và đồng thời còn diễn ra ở tầng ứng dụng (Application Layer),
+Dialogue: 0,0:03:44.44,0:03:49.72,Default,,0,0,0,,tức là tầng 7 của mô hình OSI, mà trong trường hợp này chúng ta xem xét giao thức HTTP.
+Dialogue: 0,0:03:50.88,0:03:54.00,Default,,0,0,0,,Được rồi, chúng ta cần làm rõ một điều quan trọng ở đây.
+Dialogue: 0,0:03:54.11,0:03:56.42,Default,,0,0,0,,Chúng ta không chỉ đơn thuần nói về Spoofing (Mạo danh).
+Dialogue: 0,0:03:56.80,0:04:02.22,Default,,0,0,0,,Spoofing là khi tôi thay đổi địa chỉ IP hoặc MAC để giả dạng thành một người dùng khác và đánh cắp dữ liệu, chứ tôi không thực sự chiếm quyền một phiên đang chạy.
+Dialogue: 0,0:04:02.24,0:04:06.58,Default,,0,0,0,,Còn điều chúng ta đang làm ở đây là Hijacking (Cướp quyền phiên). Trong trường hợp này,
+Dialogue: 0,0:04:06.97,0:04:09.58,Default,,0,0,0,,đang có một phiên làm việc hợp lệ và đang hoạt động giữa thiết bị và web server,
+Dialogue: 0,0:04:09.77,0:04:16.76,Default,,0,0,0,,và kẻ tấn công sẽ nhảy vào chiếm quyền điều khiển phiên đó.
+Dialogue: 0,0:04:16.77,0:04:19.51,Default,,0,0,0,,Đó chính là sự khác biệt cốt lõi.
+Dialogue: 0,0:04:19.73,0:04:25.45,Default,,0,0,0,,Và đó là trọng tâm của module này: Tấn công chiếm quyền phiên (Session Hijacking).
+Dialogue: 0,0:04:33.95,0:04:39.33,Default,,0,0,0,,Bây giờ chúng ta bước vào mục tiêu số 2, nơi chúng ta tìm hiểu loại hình cụ thể của Session Hijacking.
+Dialogue: 0,0:04:39.35,0:04:42.85,Default,,0,0,0,,Phần đầu tiên chúng ta thấy ở đây, phần tầng mạng ta sẽ nói sau,
+Dialogue: 0,0:04:42.86,0:04:48.48,Default,,0,0,0,,đó là Session Hijacking ở tầng ứng dụng (Application Level).
+Dialogue: 0,0:04:49.51,0:04:55.67,Default,,0,0,0,,Ở tầng ứng dụng, có rất nhiều kỹ thuật có thể xảy ra nếu bạn nhìn vào đây.
+Dialogue: 0,0:04:55.69,0:04:58.48,Default,,0,0,0,,Những gì chúng ta sẽ làm là dự đoán Session Token (mã định danh phiên).
+Dialogue: 0,0:04:58.48,0:05:03.95,Default,,0,0,0,,Chúng ta có thể đánh cắp các Session ID này bằng cách nghe lén (sniffing).
+Dialogue: 0,0:05:04.14,0:05:08.82,Default,,0,0,0,,Chúng ta dự đoán giá trị tiếp theo. Kỹ thuật này hoạt động như thế nào?
+Dialogue: 0,0:05:08.82,0:05:15.51,Default,,0,0,0,,Hãy cùng xem các hệ thống này vận hành ra sao.
+Dialogue: 0,0:05:15.67,0:05:19.39,Default,,0,0,0,,Chúng ta giả định trước một vài điều như sau:
+Dialogue: 0,0:05:19.48,0:05:24.29,Default,,0,0,0,,Điều thứ nhất, ta có kết nối từ máy tính xách tay của tôi đến máy chủ web,
+Dialogue: 0,0:05:24.60,0:05:28.60,Default,,0,0,0,,đúng không nào? Và kết nối đó đã được thiết lập thành công
+Dialogue: 0,0:05:28.60,0:05:30.70,Default,,0,0,0,,thông qua cú bắt tay 3 bước TCP (TCP 3-way handshake).
+Dialogue: 0,0:05:31.04,0:05:36.16,Default,,0,0,0,,Hiện tại tôi đang gửi và nhận các gói tin qua kết nối đó.
+Dialogue: 0,0:05:37.20,0:05:43.98,Default,,0,0,0,,Bây giờ hãy xem xét các quy luật/mẫu hình của Session Token mà kết nối sử dụng.
+Dialogue: 0,0:05:44.32,0:05:47.67,Default,,0,0,0,,Nhìn sang đây, chúng ta thấy có dạng Token tuần tự (Sequential tokens).
+Dialogue: 0,0:05:48.23,0:05:51.14,Default,,0,0,0,,Phần này là hằng số cố định, không thay đổi.
+Dialogue: 0,0:05:51.57,0:05:54.54,Default,,0,0,0,,Nhưng nếu bạn nhìn vào con số khác đi kèm với token này,
+Dialogue: 0,0:05:54.55,0:05:58.89,Default,,0,0,0,,nó tự tăng dần: ta thấy 1, 2, 3, 4 ở cột này.
+Dialogue: 0,0:05:59.39,0:06:06.14,Default,,0,0,0,,Dạng này cực kỳ dễ đoán. Một trường hợp khác là không gian token quá nhỏ (Small token space).
+Dialogue: 0,0:06:06.16,0:06:09.85,Default,,0,0,0,,Nếu chúng ta nhìn vào đây, đặc biệt nếu chỉ có 2 ký tự,
+Dialogue: 0,0:06:09.85,0:06:16.72,Default,,0,0,0,,hoặc kể cả 4 ký tự thì không gian mẫu vẫn quá nhỏ đối với một cuộc tấn công vét cạn (Brute-force).
+Dialogue: 0,0:06:16.73,0:06:20.36,Default,,0,0,0,,Kẻ tấn công hoàn toàn có thể brute-force ra token tiếp theo.
+Dialogue: 0,0:06:20.89,0:06:26.73,Default,,0,0,0,,Ngoài ra, nhìn sang phía ngoài cùng bên phải màn hình, chúng ta thấy có vài thành phần:
+Dialogue: 0,0:06:26.75,0:06:32.67,Default,,0,0,0,,một hằng số cố định, một ngày tháng. Ta phân tích và thấy đây là ngày tháng.
+Dialogue: 0,0:06:32.67,0:06:34.50,Default,,0,0,0,,Được rồi, đó là ngày hôm nay.
+Dialogue: 0,0:06:34.79,0:06:40.77,Default,,0,0,0,,Và rồi ta thấy có ký tự giờ T, và khi thời gian trôi qua từng giây, từng phút
+Dialogue: 0,0:06:40.79,0:06:42.00,Default,,0,0,0,,nó sẽ thay đổi. Đó là mốc thời gian.
+Dialogue: 0,0:06:42.01,0:06:48.35,Default,,0,0,0,,Vậy tôi có thể đoán trước ngày giờ tiếp theo và dự đoán chính xác Session Token đó.
+Dialogue: 0,0:06:49.20,0:06:53.20,Default,,0,0,0,,Vì sao lại có thể làm được việc này? Nguyên nhân thứ nhất:
+Dialogue: 0,0:06:53.20,0:06:57.39,Default,,0,0,0,,Ở dưới này: Thiếu cơ chế giới hạn tần suất (Lack of rate limiting). Không có rate limiting,
+Dialogue: 0,0:06:57.39,0:07:04.23,Default,,0,0,0,,bạn có thể tạo và thử hàng loạt token, bạn có thể đoán đi đoán lại nhiều lần
+Dialogue: 0,0:07:04.25,0:07:06.95,Default,,0,0,0,,mà không hề bị hệ thống chặn.
+Dialogue: 0,0:07:07.20,0:07:08.54,Default,,0,0,0,,Điều đó rất thuận lợi cho kẻ tấn công.
+Dialogue: 0,0:07:08.94,0:07:12.94,Default,,0,0,0,,Và nguyên nhân thứ hai, nhân tiện ta cũng sẽ gặp lại ở phần sau,
+Dialogue: 0,0:07:12.95,0:07:17.26,Default,,0,0,0,,khi đến phần tấn công mạng không dây (Wi-Fi),
+Dialogue: 0,0:07:17.29,0:07:20.63,Default,,0,0,0,,chúng ta sẽ đào sâu về bộ sinh số ngẫu nhiên, cụ thể là
+Dialogue: 0,0:07:20.77,0:07:21.83,Default,,0,0,0,,PRNG (Bộ sinh số giả ngẫu nhiên).
+Dialogue: 0,0:07:22.20,0:07:28.98,Default,,0,0,0,,Với thuật toán PRNG có thể đoán trước được, bạn có thể sinh ra chuỗi token tiếp theo
+Dialogue: 0,0:07:29.16,0:07:35.20,Default,,0,0,0,,bởi vì quy luật của nó có tính dự đoán rất cao. Đó là những lý do ta có thể dự đoán
+Dialogue: 0,0:07:35.22,0:07:36.51,Default,,0,0,0,,Session Token.
+Dialogue: 0,0:07:36.77,0:07:40.54,Default,,0,0,0,,Và nếu ta đoán được token, kết hợp với việc mạo danh địa chỉ IP (IP spoofing),
+Dialogue: 0,0:07:40.64,0:07:46.79,Default,,0,0,0,,thì ta có thể chiếm quyền phiên làm việc đó, và đó chính là những gì ta tìm hiểu ở phần này.
+Dialogue: 0,0:07:48.07,0:07:52.92,Default,,0,0,0,,Được rồi, một khi chúng ta đã dự đoán được Session Token,
+Dialogue: 0,0:07:53.22,0:07:55.73,Default,,0,0,0,,thì ta có thể nhảy vào tiếp quản phiên làm việc đó.
+Dialogue: 0,0:07:56.20,0:08:00.95,Default,,0,0,0,,Và anh chàng người dùng kia vẫn đang ngồi trên máy tính lướt web rất vui vẻ.
+Dialogue: 0,0:08:00.95,0:08:06.04,Default,,0,0,0,,Anh ta đang kết nối đến một ứng dụng web, mà không hề hay biết rằng kẻ tấn công
+Dialogue: 0,0:08:06.29,0:08:12.79,Default,,0,0,0,,đang đoán được Session ID, mạo danh địa chỉ IP của nạn nhân, và chuyển hướng
+Dialogue: 0,0:08:12.79,0:08:18.61,Default,,0,0,0,,gói tin giao tiếp tiếp theo: thay vì gửi về cho nạn nhân thì nó lại gửi về cho kẻ tấn công,
+Dialogue: 0,0:08:18.69,0:08:22.76,Default,,0,0,0,,và kẻ tấn công về cơ bản đang thực hiện một cuộc tấn công Man-in-the-Middle (Đứng ở giữa).
+Dialogue: 0,0:08:23.70,0:08:27.07,Default,,0,0,0,,Được rồi, chúng ta còn có khả năng làm tổn hại
+Dialogue: 0,0:08:27.07,0:08:31.72,Default,,0,0,0,,Session ID bằng phương pháp thao túng Man-in-the-Browser (Kẻ đứng giữa trình duyệt).
+Dialogue: 0,0:08:31.82,0:08:36.40,Default,,0,0,0,,Kỹ thuật này thực sự rất thú vị, hãy xem nó hoạt động thế nào.
+Dialogue: 0,0:08:36.48,0:08:41.46,Default,,0,0,0,,Đây là MITB - Man-in-the-Browser. Cuộc tấn công này bắt đầu từ đâu?
+Dialogue: 0,0:08:41.82,0:08:47.69,Default,,0,0,0,,Đầu tiên, ai đó lướt web trên internet và vô tình bị nhiễm mã độc Trojan Horse.
+Dialogue: 0,0:08:48.66,0:08:54.09,Default,,0,0,0,,Những gì Trojan làm là chặn bắt các lệnh gọi giữa trình duyệt và lớp bảo mật của nó.
+Dialogue: 0,0:08:54.21,0:08:58.57,Default,,0,0,0,,Về cơ bản, cơ chế bảo mật đã bị vô hiệu hóa đối với con Trojan này.
+Dialogue: 0,0:08:58.58,0:09:01.89,Default,,0,0,0,,Đó là bước số một: lây nhiễm. Bước số hai:
+Dialogue: 0,0:09:02.14,0:09:07.52,Default,,0,0,0,,Một đoạn mã độc hại hoặc tiện ích mở rộng (extension) độc hại được cài vào trình duyệt.
+Dialogue: 0,0:09:07.96,0:09:14.33,Default,,0,0,0,,Người dùng mở trình duyệt lên sử dụng, extension độc hại đó lập tức được kích hoạt.
+Dialogue: 0,0:09:14.34,0:09:20.53,Default,,0,0,0,,Bước số bốn: xuất hiện một trình xử lý (handler). Handler là gì? Nó sẽ phản ứng theo những điều kiện nhất định,
+Dialogue: 0,0:09:20.58,0:09:23.78,Default,,0,0,0,,ví dụ như khi nhấp chuột (onclick), di chuột (mousemove) v.v.
+Dialogue: 0,0:09:23.78,0:09:28.26,Default,,0,0,0,,Handler này sẽ chạy mỗi khi bạn truy cập vào một trang web. Nhưng trang web nào?
+Dialogue: 0,0:09:28.27,0:09:31.64,Default,,0,0,0,,Bước số năm: có một danh sách mục tiêu định sẵn.
+Dialogue: 0,0:09:31.65,0:09:34.92,Default,,0,0,0,,Nó có thể chứa danh sách hàng ngàn tổ chức tài chính, ngân hàng khác nhau.
+Dialogue: 0,0:09:34.94,0:09:39.55,Default,,0,0,0,,Bây giờ tôi là người dùng, tôi vào trang web ngân hàng của mình để đăng nhập,
+Dialogue: 0,0:09:39.66,0:09:45.48,Default,,0,0,0,,ngay lập tức handler đó bắt được sự kiện người dùng truy cập trang ngân hàng mục tiêu.
+Dialogue: 0,0:09:45.50,0:09:51.09,Default,,0,0,0,,Sau đó tôi bấm nút thực hiện giao dịch,
+Dialogue: 0,0:09:51.10,0:09:53.26,Default,,0,0,0,,và nó sẽ can thiệp vào DOM (Document Object Model).
+Dialogue: 0,0:09:53.77,0:09:57.35,Default,,0,0,0,,DOM là mô hình được dùng trong HTTP để quản lý các đối tượng trên trang web,
+Dialogue: 0,0:09:57.60,0:10:04.21,Default,,0,0,0,,cho phép trích xuất và chỉnh sửa dữ liệu. Giả sử tôi vào ngân hàng và muốn
+Dialogue: 0,0:10:04.21,0:10:07.05,Default,,0,0,0,,chuyển 10 đô la từ tài khoản thanh toán sang tài khoản tiết kiệm.
+Dialogue: 0,0:10:07.48,0:10:14.36,Default,,0,0,0,,Tôi nhấn thực hiện giao dịch 10 đô đó.
+Dialogue: 0,0:10:14.38,0:10:19.52,Default,,0,0,0,,Nhưng ở chế độ nền (background), mã độc này
+Dialogue: 0,0:10:20.19,0:10:25.96,Default,,0,0,0,,đang bí mật rút sạch toàn bộ số tiền của tôi và chuyển sang tài khoản của kẻ tấn công!
+Dialogue: 0,0:10:26.34,0:10:30.65,Default,,0,0,0,,Còn ở giao diện phía trước (foreground), màn hình vẫn hiện thông báo: "Chúc mừng, bạn vừa chuyển thành công 10 đô la".
+Dialogue: 0,0:10:30.65,0:10:35.14,Default,,0,0,0,,Mọi thứ trông hoàn toàn bình thường! Sau khi máy chủ xử lý giao dịch,
+Dialogue: 0,0:10:35.34,0:10:39.57,Default,,0,0,0,,hóa đơn biên lai được tạo ra trông cực kỳ hợp lệ.
+Dialogue: 0,0:10:39.58,0:10:42.95,Default,,0,0,0,,Nhưng ở phía sau, giao dịch thực tế đã bị tráo đổi mà người dùng không hề hay biết!
+Dialogue: 0,0:10:43.08,0:10:49.48,Default,,0,0,0,,Thật sự rất nguy hiểm. Kỹ thuật tiếp theo chúng ta nói đến là
+Dialogue: 0,0:10:50.26,0:10:53.53,Default,,0,0,0,,Session Replay (Tấn công phát lại phiên).
+Dialogue: 0,0:10:53.54,0:10:57.14,Default,,0,0,0,,Điều tôi muốn nói là kỹ thuật này không phải lúc nào cũng hiệu quả, nhưng nó hoạt động được trong một số trường hợp nhất định.
+Dialogue: 0,0:10:57.15,0:11:01.07,Default,,0,0,0,,Kẻ tấn công sẽ nghe lén (sniffing) và thu thập luồng giao tiếp giữa người dùng và phiên làm việc,
+Dialogue: 0,0:11:01.08,0:11:06.33,Default,,0,0,0,,rồi sau đó hắn phát lại (replay) các gói tin đó lên server để đòi quyền truy cập.
+Dialogue: 0,0:11:06.40,0:11:10.44,Default,,0,0,0,,Không phải lúc nào cũng thành công, nhưng đây luôn là một nguy cơ tiềm tàng.
+Dialogue: 0,0:11:10.45,0:11:14.91,Default,,0,0,0,,Kỹ thuật tiếp theo thuộc nhóm tấn công mà trong đó kẻ tấn công
+Dialogue: 0,0:11:14.92,0:11:16.64,Default,,0,0,0,,chủ động "mớm" sẵn cho nạn nhân thông tin Session ID hoặc Token
+Dialogue: 0,0:11:16.92,0:11:23.04,Default,,0,0,0,,để nạn nhân sử dụng trong quá trình giao tiếp.
+Dialogue: 0,0:11:23.23,0:11:29.34,Default,,0,0,0,,Nhìn vào đây: Bước số một bắt đầu bằng việc dụ dỗ nạn nhân nhấp vào liên kết (entice to click).
+Dialogue: 0,0:11:29.35,0:11:35.83,Default,,0,0,0,,Nạn nhân nhấp vào liên kết đó. Điều gì xảy ra tiếp theo?
+Dialogue: 0,0:11:35.84,0:11:41.60,Default,,0,0,0,,Họ đăng nhập vào một máy chủ có lỗ hổng, và hãy xem: họ có một cookie.
+Dialogue: 0,0:11:41.71,0:11:48.02,Default,,0,0,0,,Cookie đó, Session ID đó lấy từ đâu ra? Lấy từ chính kẻ tấn công!
+Dialogue: 0,0:11:48.03,0:11:53.45,Default,,0,0,0,,Kẻ tấn công lừa nạn nhân xác thực danh tính bằng một Session ID đã được biết trước.
+Dialogue: 0,0:11:53.53,0:11:56.46,Default,,0,0,0,,Sau khi nạn nhân đăng nhập thành công với Session ID đó,
+Dialogue: 0,0:11:56.47,0:11:59.55,Default,,0,0,0,,kẻ tấn công vì đã biết trước Session ID này nên có thể vào đăng nhập bất cứ khi nào hắn muốn.
+Dialogue: 0,0:11:59.76,0:12:06.03,Default,,0,0,0,,Điều bạn cần nhớ về tấn công Session Fixation (Cố định phiên) là:
+Dialogue: 0,0:12:06.04,0:12:08.39,Default,,0,0,0,,Kẻ tấn công cung cấp một Session ID hợp lệ và dụ nạn nhân đăng nhập bằng Session ID đó.
+Dialogue: 0,0:12:08.73,0:12:15.15,Default,,0,0,0,,Vì kẻ tấn công đã nắm rõ Session ID, hắn có thể sử dụng lại phiên đó tùy ý.
+Dialogue: 0,0:12:15.15,0:12:21.52,Default,,0,0,0,,Tiếp theo là Proxy Server. Kỹ thuật này cũng bắt đầu bằng việc dụ nhấp link độc hại.
+Dialogue: 0,0:12:21.53,0:12:27.91,Default,,0,0,0,,Nạn nhân nhấp vào link, và mã độc sẽ thay đổi cài đặt mạng LAN trên máy tính nạn nhân
+Dialogue: 0,0:12:27.92,0:12:34.80,Default,,0,0,0,,khiến mọi lưu lượng đều phải đi qua Proxy Server của kẻ tấn công, từ đó hắn kiểm soát phiên hoàn toàn.
+Dialogue: 0,0:12:34.82,0:12:39.20,Default,,0,0,0,,Bây giờ là cuộc tấn công mang tên CRIME attack.
+Dialogue: 0,0:12:39.21,0:12:45.21,Default,,0,0,0,,CRIME là viết tắt của: "Compression Ratio Info-leak Made Easy" (Làm rò rỉ thông tin qua tỷ lệ nén dữ liệu).
+Dialogue: 0,0:12:45.22,0:12:48.60,Default,,0,0,0,,Hãy nghĩ xem những giao thức hay ứng dụng nào sử dụng nén dữ liệu?
+Dialogue: 0,0:12:48.61,0:12:51.73,Default,,0,0,0,,Ngoài JPEG, GIF, MP3, MP4 thì SSL, TLS, SPDY và mở rộng ra là HTTPS
+Dialogue: 0,0:12:51.75,0:12:54.39,Default,,0,0,0,,cũng từng hỗ trợ cơ chế nén dữ liệu.
+Dialogue: 0,0:12:54.60,0:13:01.51,Default,,0,0,0,,Và trong trường hợp này, kẻ tấn công tấn công vào thuật toán nén đó,
+Dialogue: 0,0:13:01.52,0:13:07.59,Default,,0,0,0,,dựa vào sự thay đổi độ dài gói tin để trích xuất thông tin Session Cookie, từ đó thiết lập phiên mới.
+Dialogue: 0,0:13:07.59,0:13:09.29,Default,,0,0,0,,Hắn giải mã từng bit một và cuối cùng giải mã toàn bộ phiên làm việc.
+Dialogue: 0,0:13:10.09,0:13:12.67,Default,,0,0,0,,Tiếp theo là cuộc tấn công mang tên Forbidden Attack.
+Dialogue: 0,0:13:12.84,0:13:19.60,Default,,0,0,0,,Forbidden có nghĩa là "bị cấm". Điều gì là bị cấm?
+Dialogue: 0,0:13:19.61,0:13:26.54,Default,,0,0,0,,Điều bạn không bao giờ được phép làm trong mật mã học là: Tái sử dụng giá trị Nonce (Reuse a cryptographic Nonce).
+Dialogue: 0,0:13:26.55,0:13:29.90,Default,,0,0,0,,Từ "Nonce" trong mật mã có nghĩa là gì?
+Dialogue: 0,0:13:30.01,0:13:36.54,Default,,0,0,0,,Đó là con số ngẫu nhiên chỉ được sử dụng duy nhất một lần (Number used ONCE).
+Dialogue: 0,0:13:36.65,0:13:43.09,Default,,0,0,0,,Trong trường hợp này, hệ thống lại tái sử dụng Nonce trong quá trình bắt tay TLS (TLS Handshake).
+Dialogue: 0,0:13:43.34,0:13:45.00,Default,,0,0,0,,Khi nạn nhân thực hiện bắt tay TLS để thiết lập kết nối HTTPS,
+Dialogue: 0,0:13:45.21,0:13:49.65,Default,,0,0,0,,kẻ tấn công nghe lén và phát hiện ra giá trị Nonce bị dùng lại, từ đó hắn có thể giải mã được lưu lượng và xem toàn bộ dữ liệu phiên.
+Dialogue: 0,0:13:49.66,0:13:56.27,Default,,0,0,0,,Vấn đề này cũng sẽ xuất hiện lại khi chúng ta học về mạng không dây (Wireless).
+Dialogue: 0,0:13:56.28,0:13:58.39,Default,,0,0,0,,Các bạn có thể tìm hiểu thêm xem những cuộc tấn công nào khác cũng khai thác lỗi tái sử dụng Nonce nhé.
+Dialogue: 0,0:13:58.67,0:14:04.85,Default,,0,0,0,,Đó là nội dung của Forbidden Attack.
+Dialogue: 0,0:14:04.86,0:14:07.03,Default,,0,0,0,,Kỹ thuật tiếp theo là Session Donation (Quyên tặng phiên).
+Dialogue: 0,0:14:07.35,0:14:09.46,Default,,0,0,0,,Đây là một dạng tấn công mà kẻ tấn công đăng nhập tài khoản của chính mình lên dịch vụ,
+Dialogue: 0,0:14:09.46,0:14:13.46,Default,,0,0,0,,lấy Session ID hợp lệ, rồi "tặng" Session ID này cho nạn nhân qua một link bẫy.
+Dialogue: 0,0:14:13.46,0:14:19.03,Default,,0,0,0,,Nạn nhân bấm vào và nhập thông tin cá nhân, thẻ ngân hàng vào đó,
+Dialogue: 0,0:14:19.19,0:14:22.44,Default,,0,0,0,,và kẻ tấn công chỉ việc đăng nhập lại phiên của mình là xem được hết thông tin nạn nhân vừa điền!
+Dialogue: 0,0:14:22.71,0:14:27.21,Default,,0,0,0,,Bây giờ chúng ta sẽ bước sang phần tiếp theo.
+Dialogue: 0,0:14:27.52,0:14:31.36,Default,,0,0,0,,Chúng ta sẽ tìm hiểu về Session Hijacking ở tầng mạng.
+Dialogue: 0,0:14:32.05,0:14:38.00,Default,,0,0,0,,Hãy cùng xem xét kỹ lưỡng các kỹ thuật tầng mạng này.
+Dialogue: 0,0:14:38.01,0:14:41.88,Default,,0,0,0,,Các bạn hãy chú ý theo dõi nhé.
+Dialogue: 0,0:14:42.79,0:14:45.46,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:14:46.04,0:14:48.97,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:14:49.51,0:14:53.61,Default,,0,0,0,,Chúng ta tiếp tục với phần tiếp theo.
+Dialogue: 0,0:14:53.90,0:14:59.05,Default,,0,0,0,,Hãy nhìn vào slide hiển thị.
+Dialogue: 0,0:14:59.07,0:15:02.86,Default,,0,0,0,,Đó là những điểm mấu chốt.
+Dialogue: 0,0:15:02.88,0:15:05.53,Default,,0,0,0,,Và tiếp tục nào.
+Dialogue: 0,0:15:05.53,0:15:07.50,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:15:07.82,0:15:12.98,Default,,0,0,0,,Như vậy chúng ta đã xem xét xong phần tầng ứng dụng.
+Dialogue: 0,0:15:13.00,0:15:14.36,Default,,0,0,0,,Và bây giờ hãy bước sang phần ba.
+Dialogue: 0,0:15:14.73,0:15:18.32,Default,,0,0,0,,Mục tiêu số 3 của chúng ta.
+Dialogue: 0,0:15:18.33,0:15:22.19,Default,,0,0,0,,Đó là Network Level Session Hijacking.
+Dialogue: 0,0:15:22.97,0:15:28.71,Default,,0,0,0,,Hãy cùng tìm hiểu cách thức tấn công ở tầng mạng.
+Dialogue: 0,0:15:28.72,0:15:35.69,Default,,0,0,0,,Nơi kẻ tấn công thao túng các gói tin TCP/IP, ARP và ICMP.
+Dialogue: 0,0:15:35.80,0:15:39.47,Default,,0,0,0,,Để giành quyền kiểm soát đường truyền.
+Dialogue: 0,0:15:39.48,0:15:45.00,Default,,0,0,0,,Hãy cùng xem chi tiết nhé.
+Dialogue: 0,0:15:45.36,0:15:52.34,Default,,0,0,0,,Bắt đầu với phần này nào.
+Dialogue: 0,0:15:52.50,0:15:55.03,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:15:55.88,0:15:58.63,Default,,0,0,0,,Được rồi, một dạng khác là Session Donation (Quyên tặng phiên).
+Dialogue: 0,0:15:58.64,0:16:05.40,Default,,0,0,0,,Đây là dạng tấn công mà kẻ tấn công cung cấp cho nạn nhân
+Dialogue: 0,0:16:05.65,0:16:09.54,Default,,0,0,0,,thông tin xác thực phiên (Credential), để rồi bất cứ nơi nào nạn nhân truy cập,
+Dialogue: 0,0:16:09.55,0:16:12.53,Default,,0,0,0,,kẻ tấn công đều có quyền truy cập vào tài nguyên đó.
+Dialogue: 0,0:16:12.90,0:16:17.15,Default,,0,0,0,,Điều đầu tiên kẻ tấn công làm là:
+Dialogue: 0,0:16:17.36,0:16:22.55,Default,,0,0,0,,Đăng nhập vào một dịch vụ để thiết lập một phiên làm việc hoàn toàn hợp lệ.
+Dialogue: 0,0:16:22.57,0:16:25.41,Default,,0,0,0,,Hắn có mặt ở đó, phiên hoàn toàn hợp lệ.
+Dialogue: 0,0:16:25.42,0:16:26.52,Default,,0,0,0,,Hắn nhận được từ máy chủ một Security ID / Session ID chính thức.
+Dialogue: 0,0:16:26.88,0:16:32.25,Default,,0,0,0,,Bây giờ khi đã có Session ID này, hắn sẽ tỏ ra rất thân thiện và tốt bụng.
+Dialogue: 0,0:16:32.59,0:16:38.47,Default,,0,0,0,,Người tốt bụng thì làm gì? Họ "tặng quà". Hắn sẽ "tặng" Session ID này cho nạn nhân.
+Dialogue: 0,0:16:38.48,0:16:41.35,Default,,0,0,0,,Hắn gửi một liên kết dụ dỗ, nạn nhân nhấp vào link đó.
+Dialogue: 0,0:16:41.79,0:16:47.92,Default,,0,0,0,,Chuyện gì xảy ra tiếp theo? Nạn nhân truy cập vào, nhập thông tin cá nhân và lưu lại.
+Dialogue: 0,0:16:48.27,0:16:51.14,Default,,0,0,0,,Và bây giờ kẻ tấn công chỉ việc đăng nhập vào phiên của chính mình là lấy được toàn bộ thông tin mà nạn nhân vừa nhập vào!
+Dialogue: 0,0:16:51.15,0:16:55.55,Default,,0,0,0,,Hắn làm cho việc nạn nhân đi đâu qua link bẫy đó đều bị thu thập dữ liệu.
+Dialogue: 0,0:16:55.57,0:16:58.79,Default,,0,0,0,,Chào mừng các bạn đến với Mục 3: Chiếm quyền điều khiển phiên ở tầng mạng (Network Level Hijacking).
+Dialogue: 0,0:16:59.16,0:17:04.43,Default,,0,0,0,,Chúng ta đã tìm hiểu xong tầng ứng dụng, bây giờ sẽ tìm hiểu sang tầng mạng.
+Dialogue: 0,0:17:04.44,0:17:08.31,Default,,0,0,0,,Ở tầng mạng, chúng ta tập trung chủ yếu vào các giao thức tầng giao vận và mạng.
+Dialogue: 0,0:17:08.36,0:17:12.36,Default,,0,0,0,,Có một số kỹ thuật chính: Blind UDP, TCP/IP Hijacking,
+Dialogue: 0,0:17:12.38,0:17:19.11,Default,,0,0,0,,RST Hijacking (sử dụng cờ Reset của TCP), Man-in-the-Middle (MITM),
+Dialogue: 0,0:17:26.71,0:17:31.26,Default,,0,0,0,,bắt gói tin (Packet Sniffers), IP Spoofing và Source Routing (Định tuyến nguồn).
+Dialogue: 0,0:17:31.41,0:17:36.41,Default,,0,0,0,,Hãy cùng xem kỹ thuật đầu tiên: TCP/IP Hijacking là gì?
+Dialogue: 0,0:17:36.42,0:17:43.18,Default,,0,0,0,,Điều này chắc hẳn rất quen thuộc với bạn vì chúng ta đã nói đi nói lại nhiều lần.
+Dialogue: 0,0:17:43.18,0:17:47.00,Default,,0,0,0,,Đây là quá trình bắt tay 3 bước TCP (3-way handshake). Sau cú bắt tay,
+Dialogue: 0,0:17:47.01,0:17:50.80,Default,,0,0,0,,quá trình đánh số thứ tự (Sequencing) và xác nhận (Acknowledging) diễn ra liên tục khi dữ liệu được truyền tải.
+Dialogue: 0,0:17:50.81,0:17:56.07,Default,,0,0,0,,Nhưng ở giữa, có một kẻ tấn công đang rình rập.
+Dialogue: 0,0:17:57.08,0:18:00.70,Default,,0,0,0,,Trước khi người dùng gửi gói tin tiếp theo, kẻ tấn công dùng phần mềm bắt gói tin
+Dialogue: 0,0:18:00.71,0:18:07.65,Default,,0,0,0,,sẽ dự đoán số Sequence Number và Session ID tiếp theo, rồi nhảy vào cướp luồng giao tiếp đó.
+Dialogue: 0,0:18:07.66,0:18:08.77,Default,,0,0,0,,Một phương pháp khác là Source Routing (Định tuyến nguồn).
+Dialogue: 0,0:18:09.07,0:18:10.19,Default,,0,0,0,,Trong Source Routing, nếu kẻ tấn công không thích tuyến đường đi mặc định của gói tin qua router,
+Dialogue: 0,0:18:10.59,0:18:15.65,Default,,0,0,0,,hắn có thể chỉ định một đường đi khác.
+Dialogue: 0,0:18:15.82,0:18:19.20,Default,,0,0,0,,Kẻ tấn công mạo danh IP của máy chủ hợp lệ để thiết lập phiên,
+Dialogue: 0,0:18:19.21,0:18:22.21,Default,,0,0,0,,rồi bơm các gói tin giả mạo vào server, dự đoán Sequence Number
+Dialogue: 0,0:18:22.22,0:18:27.51,Default,,0,0,0,,và ép gói tin đi qua máy của mình đến IP đích.
+Dialogue: 0,0:18:27.52,0:18:29.70,Default,,0,0,0,,Tiếp theo là RST Hijacking (Chiếm quyền bằng cờ Reset).
+Dialogue: 0,0:18:29.93,0:18:34.94,Default,,0,0,0,,RST là một cờ (flag) trong tiêu đề gói tin TCP. Sau cú bắt tay 3 bước,
+Dialogue: 0,0:18:35.09,0:18:41.98,Default,,0,0,0,,bất kỳ lúc nào nếu nhận được cờ RST, kết nối sẽ bị hủy bỏ (reset).
+Dialogue: 0,0:18:42.00,0:18:46.80,Default,,0,0,0,,Kẻ tấn công thực hiện kỹ thuật chế tạo gói tin (Packet Crafting),
+Dialogue: 0,0:18:46.81,0:18:52.33,Default,,0,0,0,,sử dụng các công cụ như Colasoft Packet Builder để tạo ra gói tin RST giả mạo.
+Dialogue: 0,0:18:52.34,0:18:55.81,Default,,0,0,0,,Khi gói RST này được gửi đi, nó lập tức ngắt đứt kết nối của nạn nhân.
+Dialogue: 0,0:18:55.81,0:18:59.32,Default,,0,0,0,,Kẻ tấn công theo dõi luồng giao tiếp bằng Wireshark,
+Dialogue: 0,0:18:59.33,0:19:02.56,Default,,0,0,0,,xem địa chỉ IP nguồn, IP đích, Sequence Number và Acknowledgment Number.
+Dialogue: 0,0:19:02.56,0:19:09.04,Default,,0,0,0,,Hắn mạo danh IP của máy chủ, dự đoán số Ack tiếp theo, gửi gói RST để ngắt nạn nhân
+Dialogue: 0,0:19:09.41,0:19:13.51,Default,,0,0,0,,và thế chỗ để tiếp quản kết nối đó.
+Dialogue: 0,0:19:13.75,0:19:17.19,Default,,0,0,0,,Tất nhiên việc này được phần mềm tự động hóa thực hiện trong tích tắc chứ không phải làm thủ công.
+Dialogue: 0,0:19:17.43,0:19:24.18,Default,,0,0,0,,Tiếp theo là Blind Hijacking (Chiếm quyền "mù") và UDP Hijacking.
+Dialogue: 0,0:19:24.19,0:19:26.81,Default,,0,0,0,,Chúng ta cũng sẽ gặp các kiểu tấn công "mù" khi học về SQL Injection (Blind SQLi).
+Dialogue: 0,0:19:26.96,0:19:32.03,Default,,0,0,0,,Tấn công mù (Blind) có nghĩa là bạn không nhìn thấy trực tiếp phản hồi từ thiết bị mục tiêu.
+Dialogue: 0,0:19:32.04,0:19:35.60,Default,,0,0,0,,Kẻ tấn công chặn request, gửi một phản hồi chế tạo sẵn lên server,
+Dialogue: 0,0:19:35.61,0:19:42.40,Default,,0,0,0,,nhưng server lại trả phản hồi về cho nạn nhân chứ không trả cho kẻ tấn công.
+Dialogue: 0,0:19:42.41,0:19:47.65,Default,,0,0,0,,Vì vậy kẻ tấn công phải quan sát các hiệu ứng phụ (side-effects) để suy đoán kết quả.
+Dialogue: 0,0:19:48.43,0:19:55.08,Default,,0,0,0,,Còn đối với UDP Hijacking thì dễ thực hiện hơn nhiều so với TCP,
+Dialogue: 0,0:19:55.09,0:20:00.30,Default,,0,0,0,,bởi vì UDP là giao thức phi kết nối, không có Sequence Number và không có xác nhận Acknowledgment.
+Dialogue: 0,0:20:00.40,0:20:02.06,Default,,0,0,0,,Kẻ tấn công chỉ cần bắt gói UDP request và gửi giả mạo phản hồi nhanh hơn server thật một chút
+Dialogue: 0,0:20:02.40,0:20:05.26,Default,,0,0,0,,là client sẽ nhận dữ liệu giả của kẻ tấn công ngay.
+Dialogue: 0,0:20:05.51,0:20:11.58,Default,,0,0,0,,Tiếp theo là kỹ thuật tấn công Man-in-the-Middle kết hợp ICMP Spoofing và ARP Spoofing.
+Dialogue: 0,0:20:11.63,0:20:16.18,Default,,0,0,0,,Kẻ tấn công dùng công cụ bắt gói tin, biến máy mình thành cầu nối trung gian giữa client và server,
+Dialogue: 0,0:20:16.44,0:20:21.46,Default,,0,0,0,,thay đổi Default Gateway trên máy client và chuyển hướng toàn bộ gói tin qua máy kẻ tấn công.
+Dialogue: 0,0:20:21.57,0:20:25.43,Default,,0,0,0,,ICMP là giao thức dùng để gửi các thông báo lỗi mạng.
+Dialogue: 0,0:20:25.61,0:20:30.88,Default,,0,0,0,,Nếu bạn gửi thông báo lỗi ICMP giả mạo phù hợp, bạn có thể khiến máy mục tiêu thay đổi hành vi định tuyến.
+Dialogue: 0,0:20:30.89,0:20:34.57,Default,,0,0,0,,Ví dụ như gói ICMP Redirect.
+Dialogue: 0,0:20:34.58,0:20:39.31,Default,,0,0,0,,Và kết hợp với ARP Spoofing (Đầu độc bảng phân giải địa chỉ MAC-IP),
+Dialogue: 0,0:20:39.31,0:20:42.31,Default,,0,0,0,,kẻ tấn công có thể dễ dàng chen vào giữa đường truyền và chiếm trọn luồng dữ liệu.
+Dialogue: 0,0:20:42.31,0:20:48.66,Default,,0,0,0,,Một kỹ thuật đáng chú ý khác là PetitPotam.
+Dialogue: 0,0:20:48.67,0:20:52.06,Default,,0,0,0,,PetitPotam là cuộc tấn công nhằm vào Domain Controller của mạng Windows Active Directory.
+Dialogue: 0,0:20:52.55,0:20:55.79,Default,,0,0,0,,Nó khai thác API giao thức mã hóa tệp từ xa MS-EFSRPC của Microsoft,
+Dialogue: 0,0:20:55.91,0:21:01.42,Default,,0,0,0,,thực hiện chuyển tiếp xác thực NTLM (NTLM Relay Attack).
+Dialogue: 0,0:21:01.43,0:21:06.26,Default,,0,0,0,,Kẻ tấn công ép Domain Controller gửi xác thực NTLM về máy mình,
+Dialogue: 0,0:21:06.27,0:21:09.69,Default,,0,0,0,,sau đó dùng nó yêu cầu cấp chứng chỉ số từ Active Directory Certificate Services (AD CS)
+Dialogue: 0,0:21:09.79,0:21:14.95,Default,,0,0,0,,để chiếm trọn quyền Domain Admin cao nhất!
+Dialogue: 0,0:21:14.96,0:21:18.19,Default,,0,0,0,,Bây giờ, chúng ta dùng những công cụ nào để thực hiện các cuộc tấn công này?
+Dialogue: 0,0:21:18.20,0:21:23.18,Default,,0,0,0,,Bởi vì trong thực tế, các gói tin bay qua mạng quá nhanh, con người không thể quan sát bằng mắt thường.
+Dialogue: 0,0:21:23.18,0:21:28.55,Default,,0,0,0,,Công cụ đầu tiên là Hetty. Hetty hỗ trợ tấn công Machine-in-the-Middle rất tốt và liên tục được cập nhật.
+Dialogue: 0,0:21:28.56,0:21:34.81,Default,,0,0,0,,Công cụ tiếp theo là Caido. Caido là một bộ công cụ kiểm thử bảo mật gọn nhẹ để chặn bắt HTTP Request.
+Dialogue: 0,0:21:34.82,0:21:36.56,Default,,0,0,0,,Chúng ta còn có Bettercap và Ettercap, hai công cụ cực mạnh cho tấn công MITM và bắt gói tin mạng.
+Dialogue: 0,0:21:36.77,0:21:43.39,Default,,0,0,0,,Một công cụ rất nổi tiếng khác là OWASP ZAP (Zed Attack Proxy).
+Dialogue: 0,0:21:43.40,0:21:46.79,Default,,0,0,0,,ZAP hoàn toàn miễn phí, mã nguồn mở, hoạt động như một proxy trung gian giúp bạn phân tích từng header, cookie và nội dung HTML.
+Dialogue: 0,0:21:47.31,0:21:51.85,Default,,0,0,0,,Chúng ta cũng có SSLstrip. SSLstrip hoạt động rất thú vị:
+Dialogue: 0,0:21:51.86,0:21:55.15,Default,,0,0,0,,Khi người dùng muốn truy cập trang web qua HTTPS, SSLstrip sẽ đứng giữa và nói với server:
+Dialogue: 0,0:21:55.16,0:22:00.67,Default,,0,0,0,,"Tôi không hỗ trợ HTTPS, hãy hạ cấp xuống HTTP thường đi".
+Dialogue: 0,0:22:00.70,0:22:05.69,Default,,0,0,0,,Và server đồng ý hạ cấp xuống HTTP, giúp kẻ tấn công nghe lén toàn bộ dữ liệu ở dạng văn bản rõ không mã hóa!
+Dialogue: 0,0:22:05.94,0:22:10.84,Default,,0,0,0,,Và không thể không nhắc đến Burp Suite - công cụ kiểm thử web hàng đầu hiện nay của hãng PortSwigger.
+Dialogue: 0,0:22:10.85,0:22:13.26,Default,,0,0,0,,Burp Suite có bản Community miễn phí và bản Pro trả phí với đầy đủ sức mạnh vượt trội.
+Dialogue: 0,0:22:13.27,0:22:16.72,Default,,0,0,0,,Đó là những công cụ tuyệt vời phục vụ Session Hijacking.
+Dialogue: 0,0:22:16.73,0:22:22.08,Default,,0,0,0,,Bây giờ chúng ta sẽ bước sang phần cuối cùng: Các biện pháp phòng thủ (Countermeasures).
+Dialogue: 0,0:22:22.09,0:22:24.63,Default,,0,0,0,,Làm thế nào để bảo vệ hệ thống không bị chiếm quyền phiên?
+Dialogue: 0,0:22:24.64,0:22:25.81,Default,,0,0,0,,Chúng ta sẽ cùng tìm hiểu ngay sau đây.
+Dialogue: 0,0:22:26.20,0:22:31.71,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:22:31.72,0:22:35.39,Default,,0,0,0,,Hãy cùng xem xét các giải pháp phòng vệ.
+Dialogue: 0,0:22:35.60,0:22:40.91,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:22:40.92,0:22:44.17,Default,,0,0,0,,Tiếp tục nào.
+Dialogue: 0,0:22:44.18,0:22:45.79,Default,,0,0,0,,Hãy chú ý theo dõi phần phòng thủ này nhé.
+Dialogue: 0,0:22:46.10,0:22:48.83,Default,,0,0,0,,Đây là phần rất quan trọng trong bất kỳ bài thi hay đồ án an ninh mạng nào.
+Dialogue: 0,0:22:48.90,0:22:52.63,Default,,0,0,0,,Các biện pháp phòng chống Session Hijacking.
+Dialogue: 0,0:22:52.64,0:22:53.93,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:22:54.17,0:23:00.61,Default,,0,0,0,,Hãy nhìn vào slide hiển thị.
+Dialogue: 0,0:23:01.00,0:23:04.32,Default,,0,0,0,,Đó là các cơ chế cốt lõi.
+Dialogue: 0,0:23:04.33,0:23:06.57,Default,,0,0,0,,Bao gồm mã hóa dữ liệu đường truyền.
+Dialogue: 0,0:23:06.96,0:23:12.57,Default,,0,0,0,,Và xác thực an toàn.
+Dialogue: 0,0:23:12.70,0:23:18.94,Default,,0,0,0,,Cùng xem xét chi tiết nhé.
+Dialogue: 0,0:23:19.31,0:23:26.28,Default,,0,0,0,,Bắt đầu nào.
+Dialogue: 0,0:23:26.29,0:23:28.93,Default,,0,0,0,,Chúng ta gửi các thông điệp báo lỗi, đó chính là chức năng của ICMP.
+Dialogue: 0,0:23:29.09,0:23:35.85,Default,,0,0,0,,Và nếu bạn gửi đúng loại thông điệp báo lỗi, bạn có thể khiến máy tính nhận gói tin đó hành xử khác đi.
+Dialogue: 0,0:23:35.86,0:23:38.29,Default,,0,0,0,,Và đó chính là những gì chúng ta đang làm ở đây.
+Dialogue: 0,0:23:38.68,0:23:41.14,Default,,0,0,0,,Hãy hình dung một phiên bản rất đơn giản của việc này:
+Dialogue: 0,0:23:41.15,0:23:47.70,Default,,0,0,0,,Chúng ta có ICMP Echo Request và Echo Reply (lệnh ping).
+Dialogue: 0,0:23:47.71,0:23:51.81,Default,,0,0,0,,Nếu tôi gửi lệnh ping và không có phản hồi, máy của tôi sẽ phản ứng khác so với khi có phản hồi.
+Dialogue: 0,0:23:51.82,0:23:57.06,Default,,0,0,0,,Vì vậy chúng ta có thể giả mạo gói tin ICMP để thay đổi hành vi phản hồi của máy mục tiêu.
+Dialogue: 0,0:23:57.33,0:24:02.11,Default,,0,0,0,,Tiếp theo là ARP Spoofing (Mạo danh giao thức phân giải địa chỉ ARP).
+Dialogue: 0,0:24:02.13,0:24:05.33,Default,,0,0,0,,Cuộc tấn công này diễn ra ở tầng liên kết dữ liệu / mạng, làm thay đổi bảng phản hồi ARP.
+Dialogue: 0,0:24:05.43,0:24:11.79,Default,,0,0,0,,Chúng ta đã thấy điều này trong module trước và sẽ gặp lại nó.
+Dialogue: 0,0:24:11.80,0:24:15.56,Default,,0,0,0,,Cả hai kỹ thuật này đều có thể bị giả mạo để kẻ tấn công chen vào giữa cuộc hội thoại
+Dialogue: 0,0:24:15.65,0:24:21.81,Default,,0,0,0,,và chiếm quyền điều khiển đường truyền giữa hai máy tính.
+Dialogue: 0,0:24:21.82,0:24:27.68,Default,,0,0,0,,Một cuộc tấn công khác rất nguy hiểm mang tên PetitPotam.
+Dialogue: 0,0:24:27.93,0:24:32.69,Default,,0,0,0,,PetitPotam là cuộc tấn công nhằm trực tiếp vào Domain Controller (Máy chủ quản trị miền Windows).
+Dialogue: 0,0:24:32.70,0:24:35.65,Default,,0,0,0,,Công nghệ mà nó nhắm vào là API mã hóa tệp từ xa MS-EFSRPC của Microsoft.
+Dialogue: 0,0:24:35.66,0:24:42.25,Default,,0,0,0,,Và một điều tôi muốn bạn lưu ý là nó thực hiện chuyển tiếp xác thực NTLM (NTLM Relay).
+Dialogue: 0,0:24:42.26,0:24:48.16,Default,,0,0,0,,Việc sử dụng giao thức xác thực NTLM tiềm ẩn rất nhiều lỗ hổng tấn công.
+Dialogue: 0,0:24:48.17,0:24:51.08,Default,,0,0,0,,Trong một số phiên bản của cuộc tấn công này, nó thậm chí khai thác NTLMv1.
+Dialogue: 0,0:24:51.09,0:24:54.83,Default,,0,0,0,,Một thành phần nữa mà cuộc tấn công này lợi dụng là máy chủ chứng chỉ số (Certificate Server - AD CS).
+Dialogue: 0,0:24:54.84,0:24:57.56,Default,,0,0,0,,Mục tiêu của PetitPotam là đoạt lấy quyền quản trị cao nhất (Domain Admin).
+Dialogue: 0,0:24:57.83,0:25:00.50,Default,,0,0,0,,Hãy nhìn vào quy trình hoạt động: Chúng ta có người dùng hợp lệ xác thực bằng NTLM.
+Dialogue: 0,0:25:00.51,0:25:07.42,Default,,0,0,0,,Kẻ tấn công ép máy chủ gửi yêu cầu xác thực NTLM qua giao thức SMB về máy hắn.
+Dialogue: 0,0:25:08.01,0:25:12.72,Default,,0,0,0,,Hắn chuyển tiếp phản hồi xác thực NTLM này lên Certificate Server để yêu cầu cấp chứng chỉ số hợp lệ.
+Dialogue: 0,0:25:12.73,0:25:18.82,Default,,0,0,0,,Và với chứng chỉ số đó, kẻ tấn công lập tức có được đặc quyền Domain Admin!
+Dialogue: 0,0:25:19.16,0:25:24.48,Default,,0,0,0,,Đó là phương thức tấn công PetitPotam.
+Dialogue: 0,0:25:24.68,0:25:29.08,Default,,0,0,0,,Bây giờ, chúng ta sẽ nói về các công cụ (Tools).
+Dialogue: 0,0:25:29.09,0:25:33.15,Default,,0,0,0,,Như tôi đã nói, các cuộc tấn công chiếm quyền phiên không thể thực hiện thủ công bằng mắt thường vì dữ liệu truyền quá nhanh.
+Dialogue: 0,0:25:33.22,0:25:38.43,Default,,0,0,0,,Chúng ta cần các công cụ hỗ trợ Session Hijacking chuyên dụng.
+Dialogue: 0,0:25:38.43,0:25:43.78,Default,,0,0,0,,Hetty là một trong số đó. Hetty là công cụ tuyệt vời để thực hiện Machine-in-the-Middle Hijack,
+Dialogue: 0,0:25:43.79,0:25:46.72,Default,,0,0,0,,rất gọn nhẹ và được cập nhật thường xuyên.
+Dialogue: 0,0:25:46.81,0:25:52.95,Default,,0,0,0,,Một công cụ khác là Caido. Caido là một bộ công cụ kiểm toán và pentest web để chặn bắt và can thiệp HTTP Request.
+Dialogue: 0,0:25:53.16,0:25:56.94,Default,,0,0,0,,Ngoài ra chúng ta có Bettercap và Ettercap, hai công cụ kinh điển cho các cuộc tấn công Man-in-the-Middle.
+Dialogue: 0,0:25:56.95,0:26:00.58,Default,,0,0,0,,Một công cụ rất phổ biến khác mà bạn cần nắm vững là OWASP ZAP (Zed Attack Proxy).
+Dialogue: 0,0:26:00.59,0:26:05.63,Default,,0,0,0,,Nó hoàn toàn miễn phí, mã nguồn mở, hoạt động như một proxy trung gian giữa client và server.
+Dialogue: 0,0:26:05.81,0:26:10.33,Default,,0,0,0,,Bạn có thể quan sát mọi luồng thông tin đi qua, đọc header, cookie và nội dung HTML.
+Dialogue: 0,0:26:10.34,0:26:12.73,Default,,0,0,0,,Chúng ta cũng có SSLstrip. SSLstrip là một công cụ rất thú vị:
+Dialogue: 0,0:26:13.02,0:26:19.63,Default,,0,0,0,,Nó chặn kết nối HTTPS của nạn nhân và yêu cầu máy chủ web hạ cấp kết nối xuống HTTP thông thường.
+Dialogue: 0,0:26:19.64,0:26:24.08,Default,,0,0,0,,Và khi chuyển sang HTTP không mã hóa, kẻ tấn công có thể dễ dàng nghe lén và cướp phiên.
+Dialogue: 0,0:26:24.09,0:26:27.79,Default,,0,0,0,,Và một công cụ kiểm thử web hàng đầu hiện nay chính là Burp Suite của hãng PortSwigger.
+Dialogue: 0,0:26:27.80,0:26:34.14,Default,,0,0,0,,Burp Suite có nhiều tính năng vượt trội hơn so với OWASP ZAP.
+Dialogue: 0,0:26:34.15,0:26:35.55,Default,,0,0,0,,Bản Community thì miễn phí, còn bản Professional đầy đủ tính năng thì cần trả phí.
+Dialogue: 0,0:26:35.77,0:26:40.18,Default,,0,0,0,,Bây giờ chúng ta bước vào phần cuối cùng: Mục tiêu 04 - Giải thích các biện pháp phòng chống Session Hijacking.
+Dialogue: 0,0:26:40.19,0:26:46.43,Default,,0,0,0,,Làm sao để bảo vệ hệ thống không bị chiếm quyền phiên?
+Dialogue: 0,0:26:46.44,0:26:49.10,Default,,0,0,0,,Yếu tố cốt lõi và quan trọng nhất xuất hiện ở khắp mọi nơi chính là: Mã hóa toàn diện (Ubiquitous Encryption).
+Dialogue: 0,0:26:49.11,0:26:52.00,Default,,0,0,0,,Ở mục số 1, chúng ta thấy giao thức SSH.
+Dialogue: 0,0:26:52.01,0:26:58.34,Default,,0,0,0,,Ở mục số 4, chúng ta thấy cơ chế mã hóa và phòng thủ theo chiều sâu (Defense-in-Depth).
+Dialogue: 0,0:26:58.35,0:27:04.51,Default,,0,0,0,,Chúng ta thấy VPN mã hóa đường truyền. Toàn bộ dữ liệu đều được mã hóa.
+Dialogue: 0,0:27:04.52,0:27:05.82,Default,,0,0,0,,Yếu tố tiếp theo là quản lý danh tính và xác thực toàn diện (Ubiquitous IAM & Authentication).
+Dialogue: 0,0:27:06.21,0:27:10.00,Default,,0,0,0,,Chúng ta có tính năng Đăng xuất (Logout) đúng chuẩn.
+Dialogue: 0,0:27:10.01,0:27:13.51,Default,,0,0,0,,Khi người dùng bấm Đăng xuất, phiên làm việc phải được hủy bỏ hoàn toàn trên server.
+Dialogue: 0,0:27:13.52,0:27:17.33,Default,,0,0,0,,Chúng ta có giao thức Kerberos để xác thực an toàn.
+Dialogue: 0,0:27:17.68,0:27:24.66,Default,,0,0,0,,Sau đó là các giải pháp làm cho phiên làm việc khó bị tấn công hơn:
+Dialogue: 0,0:27:24.67,0:27:28.43,Default,,0,0,0,,Thiết lập thời gian hết hạn phiên (Session Timeout) và làm cho Session Token ngẫu nhiên, không thể đoán trước (High entropy).
+Dialogue: 0,0:27:28.44,0:27:33.95,Default,,0,0,0,,Đồng thời sử dụng các công cụ phát hiện xâm nhập và chiếm quyền phiên:
+Dialogue: 0,0:27:33.96,0:27:37.28,Default,,0,0,0,,Hệ thống SIEM như AlienVault USM, SolarWinds Security Event Manager.
+Dialogue: 0,0:27:37.29,0:27:42.64,Default,,0,0,0,,Công cụ bắt gói tin Wireshark để phát hiện dấu hiệu bất thường.
+Dialogue: 0,0:27:43.60,0:27:45.48,Default,,0,0,0,,Hệ thống ngăn ngừa xâm nhập IPS như Check Point Quantum, IBM QRadar IPS.
+Dialogue: 0,0:27:45.50,0:27:48.81,Default,,0,0,0,,Đó là những công cụ phát hiện và phòng chống hiệu quả.
+Dialogue: 0,0:27:48.95,0:27:55.85,Default,,0,0,0,,Bây giờ chúng ta sẽ đi sâu vào các kỹ thuật ngăn chặn cụ thể.
+Dialogue: 0,0:27:55.86,0:28:00.04,Default,,0,0,0,,Cùng xem xét tiếp nhé.
+Dialogue: 0,0:28:00.05,0:28:05.10,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:28:05.11,0:28:12.04,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:28:12.05,0:28:13.91,Default,,0,0,0,,Tiếp tục nào.
+Dialogue: 0,0:28:13.92,0:28:20.68,Default,,0,0,0,,Hãy chú ý theo dõi các giải pháp này.
+Dialogue: 0,0:28:20.69,0:28:23.79,Default,,0,0,0,,Các cơ chế bảo vệ phiên làm việc.
+Dialogue: 0,0:28:23.80,0:28:30.22,Default,,0,0,0,,Bao gồm HSTS và Token Binding.
+Dialogue: 0,0:28:30.23,0:28:33.94,Default,,0,0,0,,Đó là những công nghệ rất quan trọng.
+Dialogue: 0,0:28:33.95,0:28:39.31,Default,,0,0,0,,Cùng tìm hiểu chi tiết nhé.
+Dialogue: 0,0:28:39.31,0:28:44.43,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:28:44.44,0:28:49.91,Default,,0,0,0,,Hãy xem xét tiếp nào.
+Dialogue: 0,0:28:50.02,0:28:56.13,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:28:56.15,0:29:01.91,Default,,0,0,0,,Tiếp tục nào.
+Dialogue: 0,0:29:01.92,0:29:05.51,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:29:05.65,0:29:09.93,Default,,0,0,0,,Bắt đầu tìm hiểu về HSTS và Token Binding.
+Dialogue: 0,0:29:09.94,0:29:13.58,Default,,0,0,0,,Những công nghệ bảo vệ phiên tối tân.
+Dialogue: 0,0:29:13.80,0:29:20.29,Default,,0,0,0,,Hãy xem chúng hoạt động ra sao.
+Dialogue: 0,0:29:20.30,0:29:23.35,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:29:23.36,0:29:25.47,Default,,0,0,0,,Tiếp tục nào.
+Dialogue: 0,0:29:32.52,0:29:38.98,Default,,0,0,0,,Chúng ta đang ở phần các giải pháp phòng thủ.
+Dialogue: 0,0:29:39.09,0:29:42.90,Default,,0,0,0,,Giải thích các biện pháp đối phó với Session Hijacking.
+Dialogue: 0,0:29:42.91,0:29:47.32,Default,,0,0,0,,Bạn không muốn bị cướp phiên, bạn cần làm gì?
+Dialogue: 0,0:29:47.33,0:29:49.06,Default,,0,0,0,,Hãy cùng xem.
+Dialogue: 0,0:29:49.88,0:29:52.66,Default,,0,0,0,,Các giải pháp bảo vệ cốt lõi.
+Dialogue: 0,0:29:52.67,0:29:58.18,Default,,0,0,0,,Trước hết là mã hóa toàn diện (Ubiquitous Encryption).
+Dialogue: 0,0:29:58.43,0:30:03.52,Default,,0,0,0,,Số 1: dùng SSH thay cho Telnet.
+Dialogue: 0,0:30:03.53,0:30:10.50,Default,,0,0,0,,Số 4: mã hóa dữ liệu và phòng thủ theo chiều sâu.
+Dialogue: 0,0:30:10.51,0:30:16.26,Default,,0,0,0,,Dùng VPN để mã hóa đường truyền từ xa.
+Dialogue: 0,0:30:16.43,0:30:18.14,Default,,0,0,0,,Tiếp theo là cơ chế xác thực toàn diện.
+Dialogue: 0,0:30:18.36,0:30:23.09,Default,,0,0,0,,Cần có chức năng Đăng xuất (Logout) rõ ràng.
+Dialogue: 0,0:30:23.10,0:30:25.82,Default,,0,0,0,,Hủy bỏ hoàn toàn phiên trên server khi người dùng thoát.
+Dialogue: 0,0:30:25.83,0:30:27.43,Default,,0,0,0,,Đảm bảo phiên không còn tồn tại sau khi đăng xuất.
+Dialogue: 0,0:30:27.85,0:30:32.18,Default,,0,0,0,,Sử dụng giao thức Kerberos để xác thực an toàn.
+Dialogue: 0,0:30:32.54,0:30:36.06,Default,,0,0,0,,Và tiếp theo là làm cho phiên làm việc khó bị tấn công hơn:
+Dialogue: 0,0:30:36.06,0:30:42.48,Default,,0,0,0,,Thiết lập thời gian chờ hết hạn phiên (Session Timeout).
+Dialogue: 0,0:30:42.50,0:30:49.19,Default,,0,0,0,,Và sinh ra Session Token có độ ngẫu nhiên cao, không thể dự đoán được.
+Dialogue: 0,0:30:49.51,0:30:55.91,Default,,0,0,0,,Sử dụng các công cụ giám sát và phát hiện xâm nhập.
+Dialogue: 0,0:30:55.95,0:31:00.11,Default,,0,0,0,,Hệ thống AlienVault USM trên đám mây và on-premise.
+Dialogue: 0,0:31:00.24,0:31:06.06,Default,,0,0,0,,Giám sát và phát hiện các dấu hiệu chiếm quyền phiên.
+Dialogue: 0,0:31:06.07,0:31:09.04,Default,,0,0,0,,Công cụ phân tích gói tin Wireshark.
+Dialogue: 0,0:31:09.05,0:31:13.07,Default,,0,0,0,,Công cụ mà chúng ta đã thực hành rất nhiều trong bài lab.
+Dialogue: 0,0:31:13.08,0:31:18.93,Default,,0,0,0,,Chúng ta đã dùng Wireshark rất nhiều lần trong các bài thực hành, đây là công cụ mà bạn cần phải thật thành thạo.
+Dialogue: 0,0:31:18.94,0:31:22.58,Default,,0,0,0,,Tiếp theo là các hệ thống ngăn ngừa xâm nhập (IPS) từ Check Point như Quantum IPS.
+Dialogue: 0,0:31:22.82,0:31:27.67,Default,,0,0,0,,Hệ thống SIEM từ SolarWinds: Security Event Manager.
+Dialogue: 0,0:31:27.81,0:31:30.27,Default,,0,0,0,,Hệ thống Network IPS từ IBM.
+Dialogue: 0,0:31:30.28,0:31:37.09,Default,,0,0,0,,Đó là những công cụ giúp chúng ta phát hiện và ngăn chặn xâm nhập mạng hiệu quả.
+Dialogue: 0,0:31:37.10,0:31:39.16,Default,,0,0,0,,Mục tiêu tiếp theo là làm sao để ngăn chặn hoàn toàn việc chiếm quyền phiên?
+Dialogue: 0,0:31:39.92,0:31:43.91,Default,,0,0,0,,Hãy cùng xem xét một số phương pháp kỹ thuật tiên tiến:
+Dialogue: 0,0:31:44.06,0:31:48.61,Default,,0,0,0,,Mục tiêu của tất cả các giải pháp này là đảm bảo rằng: Khi một trình duyệt, một người dùng
+Dialogue: 0,0:31:48.63,0:31:54.73,Default,,0,0,0,,đã thiết lập một kết nối hợp lệ, thì không một ai khác, không một thực thể nào khác
+Dialogue: 0,0:31:54.85,0:32:01.69,Default,,0,0,0,,có thể mạo danh hoặc sử dụng lại kết nối đó được nữa!
+Dialogue: 0,0:32:01.79,0:32:07.90,Default,,0,0,0,,Giải pháp đầu tiên là HSTS (HTTP Strict Transport Security).
+Dialogue: 0,0:32:08.35,0:32:14.64,Default,,0,0,0,,HSTS là cơ chế bảo mật nghiêm ngặt trên tầng truyền tải HTTP.
+Dialogue: 0,0:32:14.69,0:32:21.23,Default,,0,0,0,,Nó ép buộc trình duyệt chỉ được phép giao tiếp với web server thông qua giao thức mã hóa HTTPS.
+Dialogue: 0,0:32:21.25,0:32:26.55,Default,,0,0,0,,Nếu kẻ tấn công cố dùng SSLstrip để hạ cấp kết nối xuống HTTP, trình duyệt có HSTS sẽ lập tức chặn lại và từ chối kết nối!
+Dialogue: 0,0:32:26.56,0:32:32.90,Default,,0,0,0,,Giải pháp tiếp theo là Token Binding (Ràng buộc mã định danh).
+Dialogue: 0,0:32:32.91,0:32:35.97,Default,,0,0,0,,Với Token Binding, khi người dùng đăng nhập vào ứng dụng và nhận Cookie/Session ID,
+Dialogue: 0,0:32:36.16,0:32:40.18,Default,,0,0,0,,Session Token này sẽ được gắn chặt bằng mật mã với phiên TLS của chính trình duyệt đó.
+Dialogue: 0,0:32:40.19,0:32:46.89,Default,,0,0,0,,Vì Token đã bị ràng buộc vào trình duyệt gốc, nên cho dù kẻ tấn công có nghe lén và đánh cắp được chuỗi Cookie đó,
+Dialogue: 0,0:32:46.90,0:32:51.77,Default,,0,0,0,,khi hắn dán sang trình duyệt trên máy của hắn thì máy chủ sẽ lập tức phát hiện khóa mật mã không khớp và từ chối ngay!
+Dialogue: 0,0:32:51.78,0:32:57.07,Default,,0,0,0,,Kẻ tấn công hoàn toàn không thể sử dụng Cookie đánh cắp được nữa.
+Dialogue: 0,0:32:57.25,0:33:00.18,Default,,0,0,0,,Để ngăn chặn các cuộc tấn công này, giải pháp căn bản nhất vẫn là mã hóa toàn diện (Ubiquitous Encryption).
+Dialogue: 0,0:33:01.03,0:33:07.06,Default,,0,0,0,,Kể cả đối với dịch vụ phân giải tên miền DNS, ta có thể dùng DoH (DNS over HTTPS).
+Dialogue: 0,0:33:07.07,0:33:12.02,Default,,0,0,0,,Từ đó ngăn chặn kẻ tấn công nghe lén các truy vấn tên miền DNS.
+Dialogue: 0,0:33:12.03,0:33:16.15,Default,,0,0,0,,Và một giải pháp mạnh mẽ nữa là bộ giao thức IPsec (Internet Protocol Security).
+Dialogue: 0,0:33:16.16,0:33:17.45,Default,,0,0,0,,IPsec là một bộ giao thức toàn diện thường dùng cho mạng riêng ảo VPN.
+Dialogue: 0,0:33:18.11,0:33:24.97,Default,,0,0,0,,Nó cung cấp cả tính xác thực (Authentication) và tính bảo mật toàn vẹn (Confidentiality & Integrity).
+Dialogue: 0,0:33:24.98,0:33:31.75,Default,,0,0,0,,IPsec hoạt động ở hai chế độ tiêu đề chính:
+Dialogue: 0,0:33:31.83,0:33:34.31,Default,,0,0,0,,AH (Authentication Header) chịu trách nhiệm xác thực nguồn gốc và toàn vẹn gói tin.
+Dialogue: 0,0:33:34.32,0:33:39.71,Default,,0,0,0,,Và ESP (Encapsulating Security Payload) cung cấp mã hóa toàn bộ dữ liệu gói tin.
+Dialogue: 0,0:33:39.72,0:33:45.19,Default,,0,0,0,,ESP vừa mã hóa tải dữ liệu (payload), vừa cung cấp khả năng chống tấn công phát lại (Replay Protection).
+Dialogue: 0,0:33:45.20,0:33:49.78,Default,,0,0,0,,Về chế độ hoạt động, IPsec có hai chế độ:
+Dialogue: 0,0:33:49.79,0:33:53.96,Default,,0,0,0,,Chế độ Transport Mode: Tiêu đề IP gốc không bị mã hóa, gói tin có thể định tuyến bình thường trên Internet.
+Dialogue: 0,0:33:53.97,0:33:57.93,Default,,0,0,0,,Và chế độ Tunnel Mode: Toàn bộ gói tin ban đầu (bao gồm cả IP Header cũ) đều được mã hóa và bọc bên trong một IP Header mới.
+Dialogue: 0,0:33:58.02,0:34:03.94,Default,,0,0,0,,Tunnel Mode thường dùng để kết nối VPN Site-to-Site giữa hai Gateway hoặc Client-to-Site.
+Dialogue: 0,0:34:03.95,0:34:08.61,Default,,0,0,0,,IPsec sử dụng các thuật toán mã hóa mạnh mẽ như AES-256, 3DES cùng hệ thống quản lý khóa chặt chẽ.
+Dialogue: 0,0:34:08.62,0:34:12.75,Default,,0,0,0,,Khi hệ thống chạy IPsec với sự kết hợp của AH và ESP,
+Dialogue: 0,0:34:12.88,0:34:16.90,Default,,0,0,0,,thì gần như kẻ tấn công không thể nào thực hiện được tấn công Man-in-the-Middle trên đường truyền đó.
+Dialogue: 0,0:34:17.08,0:34:22.25,Default,,0,0,0,,Tóm lại, trong bài học này chúng ta đã tìm hiểu toàn diện về Session Hijacking:
+Dialogue: 0,0:34:22.26,0:34:29.10,Default,,0,0,0,,Session Hijacking dẫn đến các cuộc tấn công trung gian MITM,
+Dialogue: 0,0:34:29.23,0:34:31.00,Default,,0,0,0,,cho phép kẻ tấn công trích xuất các thông tin nhạy cảm như dữ liệu cá nhân, số thẻ tín dụng,
+Dialogue: 0,0:34:32.66,0:34:38.88,Default,,0,0,0,,hoặc thực hiện các hành động tùy ý dưới danh nghĩa người dùng hợp lệ.
+Dialogue: 0,0:34:38.89,0:34:40.12,Default,,0,0,0,,Và chúng ta thấy rằng hầu hết các biện pháp phòng vệ cốt lõi
+Dialogue: 0,0:34:40.64,0:34:44.12,Default,,0,0,0,,đều dựa trên hai trụ cột vững chắc: Mã hóa (Encryption) và Xác thực (Authentication).
+Dialogue: 0,0:34:44.58,0:34:50.36,Default,,0,0,0,,Nếu bạn áp dụng mã hóa mạnh mẽ (HTTPS/TLS) và triển khai cơ chế xác thực chặt chẽ,
+Dialogue: 0,0:34:50.71,0:34:54.21,Default,,0,0,0,,thì nguy cơ bị tấn công chiếm quyền phiên sẽ được giảm thiểu tối đa.
+Dialogue: 0,0:34:54.22,0:35:01.17,Default,,0,0,0,,Đó là toàn bộ kiến thức lý thuyết của Module 11 - Session Hijacking.
+Dialogue: 0,0:35:01.20,0:35:04.84,Default,,0,0,0,,Bây giờ chúng ta sẽ cùng bước vào các bài thực hành Lab.
+Dialogue: 0,0:35:05.12,0:35:10.67,Default,,0,0,0,,Hẹn gặp lại các bạn trong bài học tiếp theo!
+Dialogue: 0,0:35:11.35,0:35:13.43,Default,,0,0,0,,Xin cảm ơn các bạn.
+Dialogue: 0,0:35:13.92,0:35:20.30,Default,,0,0,0,,Chúc các bạn học tốt.
+Dialogue: 0,0:35:20.31,0:35:23.09,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:35:23.62,0:35:26.69,Default,,0,0,0,,Tạm biệt các bạn.
+Dialogue: 0,0:35:26.96,0:35:32.58,Default,,0,0,0,,Hẹn gặp lại.
+Dialogue: 0,0:35:32.59,0:35:38.29,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:35:38.30,0:35:44.35,Default,,0,0,0,,Xin chào.
+Dialogue: 0,0:35:44.43,0:35:49.13,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:35:49.14,0:35:53.50,Default,,0,0,0,,Chào tạm biệt.
+Dialogue: 0,0:35:54.39,0:35:59.86,Default,,0,0,0,,Hẹn gặp lại trong bài tiếp theo.
+Dialogue: 0,0:35:59.87,0:36:04.29,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:36:04.51,0:36:08.53,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:36:08.54,0:36:10.48,Default,,0,0,0,,Tạm biệt.
+Dialogue: 0,0:36:11.40,0:36:14.66,Default,,0,0,0,,Hẹn gặp lại các bạn.
+Dialogue: 0,0:36:15.06,0:36:19.00,Default,,0,0,0,,Chào các bạn.
+Dialogue: 0,0:36:19.14,0:36:24.41,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:36:24.62,0:36:30.20,Default,,0,0,0,,Tạm biệt.
+Dialogue: 0,0:36:30.21,0:36:37.03,Default,,0,0,0,,Được rồi.
+Dialogue: 0,0:36:37.04,0:36:38.45,Default,,0,0,0,,Xin chào.
+Dialogue: 0,0:36:38.79,0:36:45.33,Default,,0,0,0,,Chào các bạn.
+Dialogue: 0,0:36:46.55,0:36:49.15,Default,,0,0,0,,Hẹn gặp lại.
+Dialogue: 0,0:36:49.60,0:36:56.26,Default,,0,0,0,,Tạm biệt.
+Dialogue: 0,0:36:56.27,0:37:02.27,Default,,0,0,0,,Vâng.
+Dialogue: 0,0:37:02.44,0:37:06.08,Default,,0,0,0,,Chào các bạn.
+Dialogue: 0,0:37:06.13,0:37:11.57,Default,,0,0,0,,Hẹn gặp lại trong module sau.
+Dialogue: 0,0:37:11.73,0:37:15.72,Default,,0,0,0,,Xin chào.
+Dialogue: 0,0:37:15.73,0:37:16.48,Default,,0,0,0,,Tạm biệt.
