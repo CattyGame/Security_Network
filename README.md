@@ -1,20 +1,29 @@
 # ĐỒ ÁN AN NINH MẠNG: TẤN CÔNG CHIẾM QUYỀN ĐIỀU KHIỂN PHIÊN (SESSION HIJACKING)
 ### Trường Đại học Giao thông vận tải TP.HCM (UTH) — Khoa Công nghệ Thông tin
 ### Học phần: An toàn thông tin / An ninh mạng
+### Nhóm 22: Phan Nhật Hào — Đào Duy Quân — Nguyễn Quang Vinh
+### Hotline liên hệ: 0833386443
 
 ---
 
-## 👥 THÔNG TIN NHÓM THỰC HIỆN: NHÓM 22
+## 🖥️ MÔ HÌNH THỰC HIỆN: MÔI TRƯỜNG MÁY ẢO CÔ LẬP (VMWARE WORKSTATION PRO)
+Theo quy định tại mục 2 trong file `DeTai.pdf` của Khoa CNTT - UTH, toàn bộ bài thực nghiệm được triển khai trên hệ thống mạng ảo cô lập với 3 máy ảo độc lập:
 
-| STT | Họ và Tên | Vai trò chính | Trách nhiệm |
-| :---: | :--- | :--- | :--- |
-| 1 | **Phan Nhật Hào** | Trưởng nhóm & Kỹ thuật Mạng | Thiết lập mô hình Lab ảo hóa, bắt gói tin Wireshark |
-| 2 | **Đào Duy Quân** | Kỹ thuật Ứng dụng & Khai thác | Công cụ CEH v13 (Hetty/CAIDO), demo Cookie-Editor |
-| 3 | **Nguyễn Quang Vinh** | Giải pháp Phòng thủ & Tài liệu | Cấu hình bảo mật (HTTPS, cờ Cookie), Báo cáo Word/PDF & Slide |
-
-* **Đề tài:** Tấn công chiếm quyền điều khiển phiên (Session Hijacking): Demo cách đánh cắp Cookie và chiếm phiên làm việc của người dùng trên các giao thức không bảo mật.
-* **Số điện thoại liên hệ:** 0833386443
-* **Tài liệu tham chiếu chuẩn:** Giáo trình EC-Council Certified Ethical Hacker (CEH) v13 — Module 11: *Session Hijacking*.
+```
+                            [ CARD MẠNG ẢO VMWARE: VMnet2 (Host-Only) ]
+                                   Dải IP ảo: 192.168.100.0/24
+                                                |
+            +-----------------------------------+-----------------------------------+
+            |                                   |                                   |
+            v                                   v                                   v
++-------------------------+         +-------------------------+         +-------------------------+
+|    MÁY CHỦ TARGET WEB   |         |    MÁY NẠN NHÂN VICTIM  |         |   MÁY TẤN CÔNG ATTACKER |
+| - HĐH: Linux / Windows  |         | - HĐH: Windows 10 / 11  |         | - HĐH: Kali Linux       |
+| - IP: 192.168.100.10    |         | - IP: 192.168.100.20    |         | - IP: 192.168.100.30    |
+| - Dịch vụ: Apache HTTP  |         | - Trình duyệt: Chrome/  |         | - Công cụ: Wireshark,   |
+|   (Cổng 80 - Plaintext) |         |   Edge đăng nhập phiên  |         |   Bettercap, Cookie-Edit|
++-------------------------+         +-------------------------+         +-------------------------+
+```
 
 ---
 
@@ -22,16 +31,14 @@
 
 ```text
 Security_Network/
+├── HUONG_DAN_LAB_MOI_TRUONG_AO_VMWARE_CHI_TIET.md # Cẩm nang thực hành chi tiết trên máy ảo VMware
 ├── Nhom22_SessionHijacking/              # Gói nộp bài hoàn chỉnh theo quy chuẩn Khoa CNTT
-│   ├── SETUP/                            # Script khởi chạy và cấu hình ảo hóa
-│   │   ├── start-lab.bat                 # Script chạy 1-Click trên Windows
-│   │   ├── start-lab.ps1                 # Script PowerShell tự động
-│   │   ├── Dockerfile                    # Container Target Web Server
-│   │   ├── docker-compose.yml            # Mạng ảo hóa an toàn Docker (192.168.100.0/24)
-│   │   └── vmware-lab-setup.md           # Hướng dẫn cấu hình VMware Workstation Pro
-│   ├── SOURCE/                           # Toàn bộ mã nguồn ứng dụng web thử nghiệm
-│   │   ├── server.js                     # Máy chủ Cổng sinh viên UTH (HTTP/Secure)
-│   │   └── package.json                  # Thông tin gói dự án
+│   ├── SETUP/                            # Hướng dẫn cấu hình mạng ảo trên VMware
+│   │   └── vmware-lab-setup.md           # Chi tiết các bước tạo card VMnet2 dải 192.168.100.0/24
+│   ├── SOURCE/                           # Toàn bộ mã nguồn ứng dụng web PHP triển khai trên Web Server
+│   │   ├── login.php                     # Trang đăng nhập mô phỏng Cổng sinh viên UTH
+│   │   ├── dashboard.php                 # Trang cá nhân và số dư ví học phí
+│   │   └── logout.php                    # Trang hủy phiên an toàn
 │   ├── THESIS/                           # Tài liệu báo cáo và slide thuyết trình
 │   │   ├── BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md # Toàn văn báo cáo chuẩn form Mẫu 01-BCBTL
 │   │   └── DAN_Y_SLIDE_POWERPOINT.md     # Dàn ý 28 slide PowerPoint chuẩn mẫu UTH
@@ -46,27 +53,19 @@ Security_Network/
 
 ---
 
-## ⚡ HƯỚNG DẪN CHẠY NHANH DEMO (QUICK START)
+## 🎯 QUY TRÌNH 4 BƯỚC DEMO TRÊN MÁY ẢO (STEP-BY-STEP)
 
-### Cách 1: Chạy 1-Click trên Windows
-1. Mở thư mục `Nhom22_SessionHijacking/SETUP/`.
-2. Nhấp đúp chuột vào file **`start-lab.bat`**.
-3. Trình duyệt tự động mở đến địa chỉ: `http://localhost:3000/login`.
-
-### Cách 2: Chạy bằng dòng lệnh (Node.js)
-```bash
-cd "Nhom22_SessionHijacking/SOURCE"
-node server.js
-```
-
----
-
-## 🎯 QUY TRÌNH 4 BƯỚC DEMO THỰC THI
-
-1. **Bước 1 (Nạn nhân đăng nhập):** Nạn nhân mở Chrome vào `http://localhost:3000/login`, đăng nhập với tài khoản `victim` / `uth123` $\rightarrow$ Nhận Session Cookie `SESSION_TOKEN=UTH_SESSION_VICTIM_998877`.
+1. **Bước 1 (Nạn nhân đăng nhập):** Nạn nhân trên VM Windows (`192.168.100.20`) mở Chrome truy cập `http://192.168.100.10/login.php`, đăng nhập tài khoản `victim` / `uth123` $\rightarrow$ Nhận Session Cookie `PHPSESSID=...` qua giao thức HTTP không mã hóa.
 2. **Bước 2 (Tin tặc cướp phiên):**
-   * Bắt gói tin qua Wireshark (`http.cookie contains "SESSION_TOKEN"`), trích xuất Cookie dạng plaintext.
-   * Mở trình duyệt ẩn danh (chưa đăng nhập), dùng tiện ích **Cookie-Editor** dán Cookie vào và nhấn **F5**.
+   * Trên VM Kali Linux (`192.168.100.30`), chạy ARP Spoofing bằng `bettercap` hoặc `arpspoof`.
+   * Mở **Wireshark** lọc `http.cookie contains "PHPSESSID"`, trích xuất chuỗi Cookie dạng plaintext.
+   * Mở Firefox trên Kali Linux truy cập `http://192.168.100.10/dashboard.php` (bị từ chối). Dùng tiện ích **Cookie-Editor** dán `PHPSESSID` vào và nhấn **F5**.
    * Chiếm quyền tài khoản thành công mà **KHÔNG CẦN PASSWORD**!
-3. **Bước 3 (Triển khai phòng thủ):** Bấm nút `🔄 Đổi chế độ bảo mật` $\rightarrow$ Kích hoạt Session Regeneration (token ngẫu nhiên cao) và gắn cờ `HttpOnly; SameSite=Strict`.
-4. **Bước 4 (Kiểm chứng hiệu quả):** Mở F12 Console gõ `document.cookie` bị chặn (trả về `""`), Nạn nhân Logout làm vô hiệu hóa token trên máy chủ.
+3. **Bước 3 (Triển khai phòng thủ):**
+   * Kích hoạt HTTPS (Apache SSL cổng 443) trên máy ảo Server.
+   * Cấu hình cờ `session.cookie_httponly = 1`, `session.cookie_secure = 1`, `session.cookie_samesite = "Strict"` trong `php.ini`.
+   * Thêm hàm `session_regenerate_id(true)` chống Session Fixation.
+4. **Bước 4 (Kiểm chứng hiệu quả):**
+   * Wireshark trên Kali chỉ còn thấy gói tin mã hóa `TLS Encrypted Application Data`.
+   * Mở F12 Console trên máy Nạn nhân gõ `document.cookie` bị chặn (trả về `""`).
+   * Nạn nhân bấm Đăng xuất $\rightarrow$ Server hủy phiên, Cookie trên máy Attacker lập tức mất tác dụng.

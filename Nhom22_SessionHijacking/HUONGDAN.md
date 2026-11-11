@@ -1,7 +1,8 @@
-# TÀI LIỆU HƯỚNG DẪN CÀI ĐẶT VÀ VẬN HÀNH LAB DEMO
+# TÀI LIỆU HƯỚNG DẪN THỰC HÀNH LAB MÔI TRƯỜNG ẢO (VMWARE WORKSTATION)
 # ĐỀ TÀI: TẤN CÔNG CHIẾM QUYỀN ĐIỀU KHIỂN PHIÊN (SESSION HIJACKING)
-### Trường Đại học Giao thông vận tải TP.HCM (UTH) - Khoa Công nghệ Thông tin
-### Nhóm thực hiện: Nhóm 22 (Phan Nhật Hào - Đào Duy Quân - Nguyễn Quang Vinh)
+### Trường Đại học Giao thông vận tải TP.HCM (UTH) — Khoa Công nghệ Thông tin
+### Nhóm 22: Phan Nhật Hào — Đào Duy Quân — Nguyễn Quang Vinh
+### Chuẩn kiến thức: EC-Council Certified Ethical Hacker (CEH) v13 — Module 11
 
 ---
 
@@ -11,133 +12,96 @@ Thư mục nộp bài được tổ chức theo đúng quy định tại mục 1
 
 ```text
 Nhom22_SessionHijacking/
-├── SETUP/                               # Chứa các file cài đặt và khởi chạy chương trình demo
-│   ├── start-lab.bat                    # Script chạy 1-Click trên Windows (tự động bật server & web)
-│   ├── start-lab.ps1                    # Script PowerShell khởi chạy tự động
-│   ├── Dockerfile                       # File đóng gói container Target Web Server
-│   ├── docker-compose.yml               # Cấu hình mạng ảo hóa cô lập an toàn bằng Docker
+├── SETUP/                               # Chứa tài liệu cấu hình môi trường mạng ảo
 │   └── vmware-lab-setup.md              # Hướng dẫn chi tiết cấu hình mạng ảo trên VMware Workstation
-├── SOURCE/                              # Chứa toàn bộ mã nguồn của ứng dụng web thử nghiệm
-│   ├── server.js                        # Mã nguồn máy chủ Cổng thông tin UTH Portal (Node.js)
-│   └── package.json                     # Thông tin gói và metadata dự án
+├── SOURCE/                              # Chứa mã nguồn ứng dụng web thử nghiệm (PHP/Apache)
+│   ├── login.php                        # Trang đăng nhập thử nghiệm trên Web Server
+│   ├── dashboard.php                    # Trang hồ sơ sinh viên UTH sau khi đăng nhập
+│   └── secure_dashboard.php             # Phiên bản có cờ bảo mật HttpOnly & Secure
 ├── THESIS/                              # Chứa tài liệu văn bản báo cáo và slide thuyết trình
 │   ├── BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md  # Toàn văn báo cáo đồ án chuẩn format UTH (>25 trang)
 │   └── DAN_Y_SLIDE_POWERPOINT.md        # Dàn ý 28 slide PowerPoint chuẩn mẫu UTH (size 32/26)
 ├── SOFT/                                # Danh mục phần mềm và link tải
 │   └── DANH_SACH_PHAN_MEM_VA_LINK_DOWNLOAD.md # Danh sách VMware, Wireshark, Hetty, CAIDO, ZAP
-└── HUONGDAN.md                          # Hướng dẫn sử dụng chi tiết (File này)
+└── HUONGDAN.md                          # Hướng dẫn thực hành Lab chi tiết (File này)
 ```
 
 ---
 
-## 2. YÊU CẦU MÔI TRƯỜNG TỐI THIỂU
-* **Hệ điều hành:** Windows 10/11, macOS hoặc Linux.
-* **Môi trường chạy web:** Đã cài đặt **Node.js** (phiên bản v18, v20 hoặc v22 LTS). Kiểm tra bằng lệnh: `node -v`.
-* **Trình duyệt web:** Google Chrome, Microsoft Edge hoặc Mozilla Firefox.
-* **Tiện ích hỗ trợ:** Cài đặt tiện ích mở rộng **Cookie-Editor** trên trình duyệt của máy Attacker.
-* **Công cụ bắt gói tin:** Wireshark hoặc Hetty (đã có sẵn trong thư mục `CEH v13 OCT 2024/MODULE 11/Hetty`).
+## 2. YÊU CẦU MÔI TRƯỜNG MÁY ẢO
+* **Phần mềm ảo hóa:** VMware Workstation Pro (hoặc Oracle VirtualBox).
+* **Các máy ảo tham gia mô hình Lab:**
+  1. **VM 1 (Target Web Server):** Ubuntu Server / Linux / Windows Server chạy Apache HTTP (Cổng 80) — IP: `192.168.100.10`.
+  2. **VM 2 (Nạn nhân - Victim):** Windows 10/11 có trình duyệt Chrome / Edge — IP: `192.168.100.20`.
+  3. **VM 3 (Kẻ tấn công - Attacker):** Kali Linux có cài sẵn Wireshark, Bettercap/arpspoof và Firefox — IP: `192.168.100.30`.
+* **Card mạng ảo:** `VMnet2 (Host-only)`, dải mạng nội bộ: `192.168.100.0/24`.
 
 ---
 
-## 3. CÁC CÁCH KHỞI CHẠY LAB DEMO
+## 3. CÁC BƯỚC THIẾT LẬP MẠNG LAB TRÊN VMWARE WORKSTATION
 
-### CÁCH 1: KHỞI CHẠY NHANH 1-CLICK TRÊN WINDOWS (KHUYÊN DÙNG KHI BẢO VỆ TRỰC TIẾP)
-1. Truy cập vào thư mục `Nhom22_SessionHijacking/SETUP/`.
-2. **Nhấp đúp chuột vào file `start-lab.bat`**.
-3. Cửa sổ Command Prompt sẽ tự động mở lên, khởi chạy Web Server tại cổng `3000` và tự động mở trình duyệt Chrome điều hướng đến:
-   `http://localhost:3000/login`
-4. Môi trường Lab đã sẵn sàng để demo!
+1. **Tạo card mạng `VMnet2`:**
+   * Mở VMware $\rightarrow$ chọn menu **Edit** $\rightarrow$ **Virtual Network Editor...** $\rightarrow$ **Change Settings**.
+   * Nhấn **Add Network...** $\rightarrow$ chọn **VMnet2** $\rightarrow$ Chọn chế độ **Host-only**.
+   * Cấu hình Subnet IP: `192.168.100.0`, Subnet mask: `255.255.255.0`.
+   * Bấm **Apply** $\rightarrow$ **OK**.
+2. **Gán card mạng cho 3 máy ảo:**
+   * Với mỗi máy ảo (Server, Victim, Kali Linux): Chuột phải $\rightarrow$ **Settings...** $\rightarrow$ **Network Adapter** $\rightarrow$ Chọn **Custom: Specific virtual network** $\rightarrow$ Chọn **VMnet2 (Host-only)**.
+3. **Kiểm tra thông mạng:**
+   * Từ máy Kali Linux (`192.168.100.30`), mở terminal gõ:
+     ```bash
+     ping 192.168.100.10   # Ping Server
+     ping 192.168.100.20   # Ping Victim
+     ```
 
 ---
 
-### CÁCH 2: KHỞI CHẠY BẰNG MÔI TRƯỜNG ẢO HÓA DOCKER
-Nếu muốn chứng minh môi trường Lab được cô lập hoàn toàn bằng Docker với Thầy/Cô:
-1. Mở Terminal / PowerShell tại thư mục `Nhom22_SessionHijacking/SETUP/`.
-2. Gõ lệnh:
+## 4. QUY TRÌNH 4 BƯỚC DEMO TẤN CÔNG & PHÒNG THỦ
+
+### BƯỚC 1: NẠN NHÂN ĐĂNG NHẬP TRÊN VM WINDOWS
+1. Trên máy ảo **Windows Victim (`192.168.100.20`)**, mở trình duyệt.
+2. Truy cập: `http://192.168.100.10/login.php` (hoặc `/dvwa/login.php`).
+3. Đăng nhập tài khoản: `victim` / `uth123`.
+4. Xem thông tin cá nhân và số dư ví tại `dashboard.php`.
+5. Server cấp Cookie phiên: `PHPSESSID=...` trên giao thức HTTP không mã hóa.
+
+---
+
+### BƯỚC 2: TIN TẶC BẮT GÓI TIN TRÊN VM KALI LINUX
+1. Mở Terminal Kali Linux, thực hiện chuyển hướng lưu lượng bằng ARP Spoofing:
    ```bash
-   docker compose up --build
+   sudo sysctl -w net.ipv4.ip_forward=1
+   sudo arpspoof -i eth0 -t 192.168.100.20 192.168.100.10
    ```
-3. Docker sẽ tự động tạo mạng ảo riêng biệt `uth_session_lab_net` (`192.168.100.0/24`) và cấp IP `192.168.100.10` cho container máy chủ.
-4. Truy cập web tại: `http://localhost:3000/login`.
+2. Khởi động **Wireshark** trên Kali Linux, lắng nghe trên card `eth0`.
+3. Nhập bộ lọc:
+   ```wireshark
+   http.cookie contains "PHPSESSID"
+   ```
+4. Khi Nạn nhân lướt web, gói tin HTTP lộ diện. Chuột phải chọn **Follow $\rightarrow$ HTTP Stream**.
+5. Đọc trực tiếp chuỗi: `Cookie: PHPSESSID=xxxxxx`.
 
 ---
 
-### CÁCH 3: KHỞI CHẠY TRÊN HỆ THỐNG MÁY ẢO VMWARE WORKSTATION PRO
-1. Cài đặt VMware Workstation Pro từ file:
-   `CEH v13 OCT 2024/CEHv13 ISO/VMware Workstation Pro/VMware-workstation-full-17.5.2-23775571.exe`.
-2. Đọc và làm theo từng bước trong file hướng dẫn:
-   `Nhom22_SessionHijacking/SETUP/vmware-lab-setup.md`.
-3. Gán card mạng `VMnet2 (Host-only)` với dải IP `192.168.100.0/24`.
+### BƯỚC 3: TIN TẶC CHIẾM QUYỀN PHIÊN (SESSION HIJACKING)
+1. Mở trình duyệt Firefox trên máy **Kali Linux (`192.168.100.30`)**.
+2. Truy cập: `http://192.168.100.10/dashboard.php` $\rightarrow$ Bị chặn do chưa đăng nhập.
+3. Nhấn `F12` $\rightarrow$ chọn tab **Storage** $\rightarrow$ **Cookies** (hoặc dùng tiện ích **Cookie-Editor**):
+   * Thêm Cookie mới:
+     * **Name:** `PHPSESSID`
+     * **Value:** `xxxxxx` (Giá trị bắt được từ Wireshark)
+     * **Path:** `/`
+4. Nhấn **F5 (Refresh)** $\rightarrow$ **Đăng nhập tức thì vào tài khoản của Nạn nhân mà KHÔNG CẦN PASSWORD!**
 
 ---
 
-## 4. QUY TRÌNH 4 BƯỚC THỰC HIỆN DEMO CHI TIẾT
-
-### BƯỚC 1: ĐĂNG NHẬP HỢP LỆ TRÊN MÁY NẠN NHÂN (VICTIM)
-1. Mở trình duyệt Google Chrome thông thường.
-2. Truy cập: `http://localhost:3000/login`.
-3. Nhập tài khoản thử nghiệm:
-   * **Username:** `victim`
-   * **Password:** `uth123`
-4. Bấm **Đăng nhập** $\rightarrow$ Hệ thống chuyển sang trang `/dashboard`.
-5. Quan sát thấy thông tin cá nhân của Nạn nhân: Họ tên, Mã sinh viên, Số tài khoản `0833386443` và Số dư `25,000,000 VNĐ`.
-
----
-
-### BƯỚC 2: BẮT GÓI TIN VÀ CHIẾM QUYỀN PHIÊN (ATTACKER)
-
-#### 1. Bắt gói tin (Sniffing):
-* Mở phần mềm **Wireshark**, chọn card mạng `Loopback` (hoặc card mạng ảo `VMnet2`).
-* Gõ bộ lọc (Display Filter):
-  ```wireshark
-  http.cookie contains "SESSION_TOKEN"
-  ```
-* Bấm chuột phải vào gói tin `GET /dashboard` $\rightarrow$ Chọn **Follow** $\rightarrow$ **HTTP Stream**.
-* Nhìn thấy chuỗi Header dạng văn bản rõ (plaintext):
-  `Cookie: SESSION_TOKEN=UTH_SESSION_VICTIM_998877`
-* **Copy giá trị token:** `UTH_SESSION_VICTIM_998877`.
-
-#### 2. Chiếm đoạt phiên làm việc (Session Hijacking):
-* Mở một **cửa sổ Ẩn danh (Incognito Window)** hoặc mở trình duyệt Microsoft Edge.
-* Thử truy cập thẳng `http://localhost:3000/dashboard` $\rightarrow$ Server từ chối và đẩy về trang đăng nhập.
-* Nhấp vào biểu tượng tiện ích **Cookie-Editor** trên thanh công cụ trình duyệt:
-  * Nhấn nút **Add Cookie (+)**.
-  * Nhập:
-    * **Name:** `SESSION_TOKEN`
-    * **Value:** `UTH_SESSION_VICTIM_998877`
-    * **Path:** `/`
-  * Nhấn biểu tượng **Lưu (Save)**.
-* Trên trình duyệt Attacker, nhấn phím **F5 (Refresh)**.
-* 💥 **KẾT QUẢ:** Trình duyệt lập tức hiển thị toàn bộ trang cá nhân của Nạn nhân mà **hoàn toàn không cần username hay password**!
-
----
-
-### BƯỚC 3: KÍCH HOẠT VÀ MINH HỌA GIẢI PHÁP PHÒNG THỦ
-1. Trên giao diện web, nhấp chuột vào liên kết:
-   **"🔄 Bấm vào đây để chuyển đổi Chế độ Bảo mật"** (hoặc truy cập `http://localhost:3000/toggle-security`).
-2. Huy hiệu chuyển sang màu xanh lục: `🛡️ CHẾ ĐỘ AN TOÀN (HTTPS/Secure / HttpOnly)`.
-3. Khi Nạn nhân đăng nhập lại:
-   * Server cấp Session Token ngẫu nhiên cao (High Entropy).
-   * Server tự động gắn các cờ bảo mật: `HttpOnly; SameSite=Strict`.
-
----
-
-### BƯỚC 4: KIỂM CHỨNG HIỆU QUẢ SAU PHÒNG VỆ
-1. **Kiểm tra chống XSS đánh cắp Cookie:**
-   * Tại máy Nạn nhân, nhấn phím `F12` $\rightarrow$ chọn tab **Console**.
-   * Gõ lệnh: `document.cookie`.
-   * Kết quả: Trả về chuỗi rỗng `""` $\rightarrow$ Chứng minh cờ `HttpOnly` đã chặn hoàn toàn mã kịch bản độc hại.
-2. **Kiểm tra chống Replay Attack sau khi Logout:**
-   * Nạn nhân bấm nút **"Đăng xuất (Hủy phiên)"**.
-   * Trên máy Attacker (vẫn đang giữ cookie cũ), nhấn phím **F5 (Refresh)**.
-   * Kết quả: Bị văng ngay ra màn hình đăng nhập vì Server đã xóa phiên trong bộ nhớ RAM (`delete sessions[token]`).
-
----
-
-## 5. HƯỚNG DẪN XUẤT TÀI LIỆU NỘP BÀI (SANG WORD/PDF)
-* File báo cáo toàn văn đã được biên soạn sẵn tại [BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md](file:///c:/Code/An%20ninh%20m%E1%BA%A1ng/Nhom22_SessionHijacking/THESIS/BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md).
-* Thành viên **Nguyễn Quang Vinh** có thể:
-  1. Mở file `.md` bằng phần mềm **Typora**, **VS Code** hoặc công cụ chuyển đổi Pandoc.
-  2. Xuất sang định dạng **Microsoft Word (`.docx`)** hoặc **Adobe PDF (`.pdf`)**.
-  3. Căn chỉnh lề theo đúng quy định: Lề trên 2cm, lề dưới 2cm, lề trái 3cm, lề phải 2cm, Font Times New Roman cỡ 13, giãn dòng 1.3 - 1.5 lines.
-* Sao chép file hoàn thiện vào thư mục `THESIS/` trước khi nén thành file `Nhom22_SessionHijacking.zip` để nộp cho Giảng viên.
+### BƯỚC 4: TRIỂN KHAI PHÒNG THỦ & KIỂM CHỨNG
+1. **Bật mã hóa HTTPS trên Server:**
+   * Kích hoạt SSL: `sudo a2enmod ssl && sudo a2ensite default-ssl.conf && sudo systemctl restart apache2`.
+   * Nạn nhân chuyển sang truy cập: `https://192.168.100.10/dashboard.php`.
+   * Wireshark trên Kali chỉ còn thấy gói tin **TLS Encrypted Application Data**, hoàn toàn không đọc được Cookie.
+2. **Cấu hình cờ bảo mật Cookie trong `php.ini`:**
+   * `session.cookie_httponly = 1`
+   * `session.cookie_secure = 1`
+   * `session.cookie_samesite = "Strict"`
+3. **Kiểm chứng:** Mở Console trên máy Nạn nhân gõ `document.cookie` $\rightarrow$ Trả về `""` (chống XSS đánh cắp Cookie).
