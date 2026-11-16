@@ -1,78 +1,78 @@
-# HƯỚNG DẪN THIẾT LẬP MÔ HÌNH LAB ẢO HÓA TRÊN VMWARE WORKSTATION PRO
+# HƯỚNG DẪN THIẾT LẬP MÔ HÌNH LAB MÔI TRƯỜNG ẢO (VMWARE WORKSTATION PRO)
 ### Đồ án môn học: An ninh mạng — Nhóm 22 (Đại học Giao thông vận tải TP.HCM - UTH)
 ### Đề tài: Tấn công chiếm quyền điều khiển phiên (Session Hijacking)
 
 ---
 
-## 1. MỤC TIÊU CỦA MÔ HÌNH LAB ẢO HÓA
+## 1. MỤC TIÊU CỦA MÔ HÌNH LAB MÔI TRƯỜNG ẢO
 Theo yêu cầu tại mục **2. Mô hình triển khai** trong file `DeTai.pdf` của Khoa CNTT - UTH:
-* Tạo một môi trường mạng nội bộ hoàn toàn cô lập (Isolated Virtual Network), đảm bảo các hành động thử nghiệm tấn công (bắt gói tin, nghe lén HTTP, chèn cookie) diễn ra an toàn, không ảnh hưởng đến hệ thống mạng thực tế.
-* Đáp ứng đầy đủ tiêu chí đánh giá về kiến trúc mạng và kỹ năng ảo hóa của sinh viên.
+* Toàn bộ thực nghiệm chạy hoàn toàn trên **phần mềm môi trường ảo (VMware Workstation Pro)**, tạo mạng ảo tách biệt (Isolated Virtual Network), đảm bảo an toàn và không ảnh hưởng tới mạng Internet thật.
+* Triển khai ứng dụng Web chuẩn **Apache2 + PHP** trực tiếp trên máy ảo Linux trong VMware, gọn nhẹ và sát với thực tế quản trị máy chủ mạng.
 
 ---
 
 ## 2. SƠ ĐỒ MẠNG LAB (NETWORK TOPOLOGY)
 
+Nhóm triển khai mô hình trên **VMware Workstation Pro** gồm 2 máy ảo (Linux) kết nối cùng máy thật Windows qua card mạng ảo NAT `VMnet8` (dải IP `192.168.60.0/24`):
+
+```text
+                       [ MẠNG ẢO VMWARE WORKSTATION (192.168.60.0/24) ]
+                                             |
+          +----------------------------------+----------------------------------+
+          |                                  |                                  |
+          v                                  v                                  v
++-----------------------------+  +-----------------------------+  +-----------------------------+
+|  VM 1: TARGET-WEB-SERVER    |  |   HOST: VICTIM (NẠN NHÂN)   |  |  VM 2: KALI LINUX ATTACKER  |
+| - Hệ điều hành: Kali/Debian |  | - Hệ điều hành: Windows 11  |  | - Image: kali-linux-2026.3  |
+| - IP: 192.168.60.129        |  | - IP: 192.168.60.1          |  | - Giao diện: Wireshark      |
+| - Dịch vụ: Apache2 + PHP    |  | - Trình duyệt: Google Chrome|  |   (eth0), Firefox + F12     |
+| - Giao thức:                |  | - Đăng nhập Cổng SV UTH     |  |   Storage / Cookie-Editor   |
+|   + Tấn công: HTTP (80)     |  | - Kiểm chứng document.cookie|  | - Bắt & replay PHPSESSID    |
+|   + Phòng thủ: HTTPS (443)  |  |   và Logout                 |  |                             |
++-----------------------------+  +-----------------------------+  +-----------------------------+
 ```
-                            [ MẠNG ẢO NỘI BỘ (Host-Only: VMnet2) ]
-                                   Dải IP: 192.168.100.0/24
-                                              |
-            +---------------------------------+--------------------------------+
-            |                                 |                                |
-            v                                 v                                v
-+-------------------------+       +------------------------+       +------------------------+
-|    MÁY CHỦ WEB TARGET   |       |    MÁY NẠN NHÂN VICTIM |       |   MÁY TẤN CÔNG ATTACKER|
-| - HĐH: Ubuntu / Windows |       | - HĐH: Windows 10/11   |       | - HĐH: Kali Linux hoặc |
-| - IP: 192.168.100.10    |       | - IP: 192.168.100.20   |       |   Windows              |
-| - Chạy demo-lab HTTP    |       | - Đăng nhập tài khoản  |       | - IP: 192.168.100.30   |
-|   tại cổng: 3000        |       |   sinh viên UTH Portal |       | - Chạy Wireshark,      |
-|                         |       |                        |       |   Hetty & Cookie-Editor|
-+-------------------------+       +------------------------+       +------------------------+
-```
+
+> *(Ghi chú: Nếu triển khai với 3 máy ảo độc lập trên mạng cô lập hoàn toàn không thông ra Host, nhóm có thể gán cả 3 máy ảo — gồm `Target-Web-Server`, `Windows Victim VM`, và `Kali Attacker` — vào card `VMnet2 Host-only` dải `192.168.100.0/24` trong Virtual Network Editor).*
 
 ---
 
 ## 3. CÁC BƯỚC CẤU HÌNH CHI TIẾT TRÊN VMWARE WORKSTATION PRO
 
 ### Bước 1: Cài đặt VMware Workstation Pro
-* Bộ cài đặt chính thức đã có sẵn trong thư mục dự án:
+* Bộ cài đặt có sẵn trong thư mục giáo trình:  
   `CEH v13 OCT 2024/CEHv13 ISO/VMware Workstation Pro/VMware-workstation-full-17.5.2-23775571.exe`
-* Nhấp đúp chuột để tiến hành cài đặt theo mặc định (Next -> Next -> Finish).
+* Giải nén image máy ảo Kali Linux: `kali-linux-2026.3-vmware-amd64.7z` và mở bằng VMware Workstation.
 
-### Bước 2: Tạo Card mạng ảo cô lập (Virtual Network Editor)
-1. Mở phần mềm **VMware Workstation Pro**.
-2. Trên thanh menu, chọn **Edit** -> **Virtual Network Editor...**
-3. Nhấn vào nút **Change Settings** (yêu cầu quyền Administrator).
-4. Nhấn **Add Network...** -> Chọn tên card mạng: **VMnet2**.
-5. Cấu hình các thông số:
-   * Loại mạng: Chọn **Host-only (connect VMs internally in a private network)**.
-   * Bỏ tích mục *Connect a host virtual adapter to this network* (nếu muốn cô lập 100%) hoặc tích chọn nếu muốn máy thật (Host) giao tiếp được với Lab.
-   * Tích chọn: **Use local DHCP service to distribute IP address to VMs**.
-   * **Subnet IP:** `192.168.100.0`
-   * **Subnet mask:** `255.255.255.0`
-6. Nhấn **Apply** -> **OK**.
+### Bước 2: Tạo 2 máy ảo (Attacker & Target Web Server)
+1. **Máy ảo Attacker (`kali-linux-2026.3-vmware-amd64`):** Giữ nguyên dùng làm máy tấn công (có sẵn Wireshark, Firefox, Bettercap, Arpspoof).
+2. **Máy ảo Server (`Target-Web-Server`):** Trong VMware, chuột phải vào máy ảo Kali gốc $\rightarrow$ **Manage** $\rightarrow$ **Clone...** $\rightarrow$ **Create a full clone** $\rightarrow$ đặt tên `Target-Web-Server`.
+3. Đảm bảo cả 2 máy ảo đều dùng chung **Network Adapter: NAT (VMnet8)** (hoặc cùng card `VMnet2 Host-only`) để cùng dải mạng.
 
-### Bước 3: Gán Card mạng cho từng Máy ảo (VM Settings)
-Với mỗi máy ảo tham gia Lab:
-1. Nhấp chuột phải vào tên máy ảo trong danh sách bên trái -> chọn **Settings...**
-2. Chọn mục **Network Adapter**.
-3. Chọn tùy chọn: **Custom: Specific virtual network** -> chọn **VMnet2 (Host-only)**.
-4. Nhấn **OK**.
+### Bước 3: Cài đặt Web Server Apache2 + PHP trên `Target-Web-Server`
+1. Bật máy ảo `Target-Web-Server` (user/pass mặc định: `kali` / `kali`).
+2. Xem địa chỉ IP bằng lệnh:
+   ```bash
+   ip a
+   ```
+   *(Ví dụ trong Lab thực nghiệm của nhóm là `192.168.60.129`).*
+3. Copy thư mục `Nhom22_SessionHijacking` (hoặc clone repo) vào máy ảo và chạy script tự động [setup-target-server.sh](file:///c:/Code/An%20ninh%20m%E1%BA%A1ng/Nhom22_SessionHijacking/SETUP/setup-target-server.sh), hoặc chạy thủ công:
+   ```bash
+   sudo apt update && sudo apt install -y apache2 php libapache2-mod-php
+   sudo cp login.php dashboard.php logout.php /var/www/html/
+   sudo systemctl enable --now apache2
+   ```
 
-### Bước 4: Thiết lập địa chỉ IP tĩnh (Static IP) hoặc nhận DHCP
-Để kịch bản demo và viết báo cáo được đồng nhất:
-
-| Máy | Tên máy | Địa chỉ IP khuyến nghị | Dịch vụ chạy |
-| :--- | :--- | :--- | :--- |
-| **Server** | `UTH-Web-Server` | `192.168.100.10` | Chạy Node.js Server cổng 3000 (`node server.js`) |
-| **Victim** | `Victim-Student` | `192.168.100.20` | Trình duyệt Chrome truy cập `http://192.168.100.10:3000` |
-| **Attacker** | `Attacker-Kali` | `192.168.100.30` | Wireshark lắng nghe trên interface `eth0`/card mạng ảo, trình duyệt nạp cookie |
+### Bước 4: Thiết lập cây Snapshot để Demo mượt mà
+Trên máy ảo **`Target-Web-Server`**, tạo 3 Snapshot theo thứ tự (`VM` $\rightarrow$ `Snapshot` $\rightarrow$ `Take Snapshot...`):
+1. **`Http`:** Trạng thái ban đầu chỉ mở HTTP cổng 80 (`php.ini` chưa bật `HttpOnly`/`Secure`).
+2. **`https (SSL/TLS port 443)`:** Đã bật `sudo a2enmod ssl && sudo a2ensite default-ssl.conf && sudo systemctl restart apache2`.
+3. **`HttpOnly Flag`:** Đã cấu hình `session.cookie_httponly = 1`, `session.cookie_secure = 1`, `session.cookie_samesite = "Strict"` trong `/etc/php/*/apache2/php.ini` và restart Apache.
 
 ---
 
 ## 4. KIỂM TRA THÔNG MẠNG (CONNECTIVITY TEST)
-Trên máy Victim và Attacker, mở Terminal/CMD gõ lệnh:
+Từ máy thật Windows (CMD/PowerShell) và máy ảo Kali Attacker, chạy lệnh kiểm tra kết nối tới Target Web Server (`192.168.60.129`):
 ```bash
-ping 192.168.100.10
+ping 192.168.60.129
 ```
-Nếu nhận được phản hồi `Reply from 192.168.100.10: bytes=32 time<1ms TTL=64` $\rightarrow$ Môi trường mạng ảo đã hoàn toàn thông suốt và sẵn sàng cho bài thử nghiệm tấn công Session Hijacking!
+Khi nhận được phản hồi TTL từ `192.168.60.129` $\rightarrow$ Môi trường Lab VMware đã thông suốt và sẵn sàng trình diễn Demo.

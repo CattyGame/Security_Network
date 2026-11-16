@@ -74,16 +74,17 @@ Chúng em xin kính chúc Quý Thầy/Cô dồi dào sức khỏe, hạnh phúc 
 * **Hình 1.1:** Sơ đồ bản chất Stateless của giao thức HTTP.
 * **Hình 1.2:** Cơ chế trao đổi Session ID và Cookie giữa Client và Server.
 * **Hình 1.3:** Phân loại các hình thức tấn công Session Hijacking theo CEH v13.
-* **Hình 2.1:** Sơ đồ kiến trúc mạng Lab ảo hóa trên VMware Workstation Pro / Docker.
-* **Hình 3.1:** Giao diện đăng nhập Cổng thông tin sinh viên UTH ở chế độ HTTP Plaintext.
-* **Hình 3.2:** Bắt gói tin chứa trường `Cookie: SESSION_TOKEN` trên Wireshark.
-* **Hình 3.3:** Bơm Cookie thành công bằng tiện ích Cookie-Editor trên trình duyệt Attacker.
-* **Hình 3.4:** Trang cá nhân và số dư tài khoản của nạn nhân bị chiếm đoạt.
-* **Hình 4.1:** Kích hoạt chế độ bảo mật với cờ `HttpOnly` và `SameSite`.
-* **Hình 4.2:** Kết quả kiểm chứng mã độc JavaScript không thể đọc cookie sau khi có phòng thủ.
+* **Hình 2.1:** Sơ đồ kiến trúc mạng Lab ảo hóa trên VMware Workstation Pro.
+* **Hình 3.1:** Giao diện đăng nhập Cổng thông tin sinh viên UTH ở chế độ HTTP Plaintext (cổng 80).
+* **Hình 3.2:** Bắt gói tin chứa trường `Cookie: PHPSESSID` dưới dạng bản rõ trên Wireshark.
+* **Hình 3.3:** Bơm Cookie `PHPSESSID` vào trình duyệt Firefox trên máy ảo Kali Linux.
+* **Hình 3.4:** Trang cá nhân và số dư ví học phí 25.000.000 VNĐ của nạn nhân bị chiếm đoạt không cần mật khẩu.
+* **Hình 4.1:** Lưu lượng HTTPS (SSL/TLS cổng 443) bị mã hóa thành `TLSv1.3 Application Data` trên Wireshark.
+* **Hình 4.2:** Thuộc tính cờ `HttpOnly`, `Secure`, `SameSite` trong DevTools và kết quả kiểm chứng `document.cookie` trả về `""`.
+* **Hình 4.3:** Kiểm chứng hủy phiên sau khi Đăng xuất (`logout.php`) khiến trình duyệt kẻ tấn công bị đá về trang đăng nhập.
 * **Bảng 1.1:** Bảng so sánh thuộc tính các cờ bảo mật của Cookie.
 * **Bảng 1.2:** Bảng so sánh bản chất Session Hijacking và Session Spoofing.
-* **Bảng 4.1:** Bảng phân chia trách nhiệm và ma trận phân công công việc Nhóm 22.
+* **Bảng 4.1:** Bảng phân chia trách nhiệm và kết quả thực nghiệm Nhóm 22.
 
 ---
 
@@ -105,22 +106,23 @@ Chúng em xin kính chúc Quý Thầy/Cô dồi dào sức khỏe, hạnh phúc 
 * **CHƯƠNG 2: THIẾT KẾ MÔ HÌNH LAB ẢO HÓA AN TOÀN**
   * 2.1. Yêu cầu kiến trúc và tính an toàn của môi trường Lab
   * 2.2. Sơ đồ mạng Lab (Network Topology)
-  * 2.3. Cấu hình phân đoạn mạng ảo hóa (VMware Workstation / Docker)
-  * 2.4. Triển khai ứng dụng Web mục tiêu (Target Web Application)
+  * 2.3. Cấu hình phân đoạn mạng ảo hóa trên VMware Workstation Pro
+  * 2.4. Triển khai ứng dụng Web mục tiêu trên Apache2 và PHP
 * **CHƯƠNG 3: KỊCH BẢN VÀ THỰC NGHIỆM TẤN CÔNG (EXPLOITATION PHASE)**
   * 3.1. Kịch bản tổng thể
-  * 3.2. Pha 1: Nạn nhân đăng nhập hợp lệ qua HTTP
-  * 3.3. Pha 2: Bắt gói tin và trích xuất Session Cookie (Wireshark & Hetty)
-  * 3.4. Pha 3: Chiếm quyền phiên làm việc (Session Hijacking via Cookie Injection)
+  * 3.2. Pha 1: Nạn nhân đăng nhập hợp lệ qua HTTP (Cổng 80)
+  * 3.3. Pha 2: Bắt gói tin và trích xuất `PHPSESSID` trên Wireshark
+  * 3.4. Pha 3: Chiếm quyền phiên làm việc trên Kali Linux (Session Replay)
 * **CHƯƠNG 4: GIẢI PHÁP PHÒNG THỦ VÀ KIỂM CHỨNG HIỆU QUẢ**
-  * 4.1. Mã hóa toàn trình với HTTPS và kích hoạt HSTS
-  * 4.2. Cấu hình cờ bảo mật `HttpOnly`, `Secure`, `SameSite`
+  * 4.1. Mã hóa toàn trình với HTTPS (SSL/TLS cổng 443) và HSTS
+  * 4.2. Cấu hình cờ bảo mật `HttpOnly`, `Secure`, `SameSite` trong `php.ini`
   * 4.3. Tái tạo mã phiên sau đăng nhập (Session Regeneration)
   * 4.4. Quản lý thời gian sống và hủy phiên triệt để khi Logout
   * 4.5. Thực nghiệm kiểm chứng lại sau khi áp dụng phòng thủ
 * **CHƯƠNG 5: KẾT LUẬN VÀ BÀI HỌC KINH NGHIỆM CHO DOANH NGHIỆP**
   * 5.1. Đánh giá kết quả đạt được của đề tài
   * 5.2. Bài học khuyến nghị an toàn cho các tổ chức giáo dục và doanh nghiệp
+* **PHỤ LỤC**
 * **TÀI LIỆU THAM KHẢO**
 
 ---
@@ -174,22 +176,22 @@ Giao thức HTTP truyền toàn bộ dữ liệu (URL, tham số POST, Header `C
 # CHƯƠNG 2: THIẾT KẾ MÔ HÌNH LAB ẢO HÓA AN TOÀN
 
 ## 2.1. Yêu cầu kiến trúc và tính an toàn của môi trường Lab
-Theo đúng quy định tại mục 2 trong file `DeTai.pdf` của Khoa CNTT - UTH, nhóm thiết lập môi trường Lab ảo hóa cô lập (Isolated Network) để đảm bảo an toàn tuyệt đối.
+Theo đúng quy định tại mục 2 trong file `DeTai.pdf` của Khoa CNTT - UTH, nhóm triển khai toàn bộ bài thực nghiệm trên **phần mềm ảo hóa VMware Workstation Pro** tạo thành một mạng nội bộ ảo cô lập (Isolated Virtual Network), đảm bảo các thao tác nghe lén gói tin và chiếm quyền phiên diễn ra an toàn, không ảnh hưởng đến hệ thống mạng thật bên ngoài.
 
 ## 2.2. Sơ đồ mạng Lab (Network Topology)
-Mô hình mạng bao gồm 3 thực thể kết nối vào cùng dải mạng ảo `192.168.100.0/24`:
-1. **Target Web Server (192.168.100.10):** Chạy ứng dụng Cổng thông tin sinh viên UTH tại cổng HTTP 3000 (`demo-lab/server.js`).
-2. **Victim Client (192.168.100.20):** Máy nạn nhân sử dụng trình duyệt Google Chrome đăng nhập tài khoản sinh viên.
-3. **Attacker Client (192.168.100.30):** Máy kẻ tấn công chạy Wireshark, Hetty và trình duyệt ẩn danh tích hợp Cookie-Editor.
+Mô hình mạng ảo gồm 3 thực thể kết nối chung dải mạng nội bộ VMware `192.168.60.0/24`:
+1. **Máy chủ Mục tiêu — `Target-Web-Server` (`192.168.60.129`):** Máy ảo Linux (Clone từ Kali/Debian VMware) cài đặt **Apache2 + PHP**, chạy ứng dụng Cổng thông tin sinh viên UTH (`login.php`, `dashboard.php`, `logout.php`) trên cổng HTTP 80 (giai đoạn tấn công) và HTTPS 443 (giai đoạn phòng thủ).
+2. **Máy Nạn nhân — Victim Host (`192.168.60.1`):** Máy Windows sử dụng trình duyệt Google Chrome truy cập và đăng nhập tài khoản sinh viên UTH.
+3. **Máy Tấn công — `kali-linux-2026.3-vmware-amd64` (Attacker VM):** Máy ảo Kali Linux chạy **Wireshark** lắng nghe trên card mạng `eth0` và trình duyệt **Firefox** (F12 Storage / Cookie-Editor) để thực hiện phát lại phiên (Session Replay).
 
-## 2.3. Cấu hình phân đoạn mạng ảo hóa (VMware Workstation / Docker)
-* **Phương án VMware Workstation Pro:** Sử dụng card mạng `VMnet2 (Host-only)`, cấu hình DHCP cấp dải IP `192.168.100.0/24`.
-* **Phương án Docker:** Sử dụng `docker-compose.yml` tạo mạng ảo bridge `uth_session_lab_net` với IP tĩnh `192.168.100.10` cho container máy chủ.
+## 2.3. Cấu hình phân đoạn mạng ảo hóa trên VMware Workstation Pro
+* **Card mạng ảo:** Sử dụng mạng ảo VMware `VMnet8 (NAT)` dải `192.168.60.0/24` (hoặc `VMnet2 Host-only` dải `192.168.100.0/24` nếu bổ sung thêm máy ảo Windows Victim tách biệt hoàn toàn với máy thật).
+* **Quản lý trạng thái thử nghiệm bằng Snapshot:** Trên máy ảo `Target-Web-Server`, nhóm thiết lập cây **Snapshot** gồm 3 mốc (`Http` $\rightarrow$ `https (SSL/TLS port 443)` $\rightarrow$ `HttpOnly Flag`) để đối chứng chính xác kết quả trước và sau khi áp dụng từng lớp phòng vệ.
 
-## 2.4. Triển khai ứng dụng Web mục tiêu (Target Web Application)
-Nhóm tự xây dựng ứng dụng web độc lập bằng Node.js thuần (không phụ thuộc thư viện ngoài), hỗ trợ 2 chế độ:
-* Chế độ Lỗ hổng (Vulnerable Mode): HTTP Plaintext, Cookie không có cờ bảo mật.
-* Chế độ An toàn (Secured Mode): Session ID ngẫu nhiên cao, có cờ `HttpOnly`, `SameSite=Strict`.
+## 2.4. Triển khai ứng dụng Web mục tiêu trên Apache2 và PHP
+Nhóm tự xây dựng ứng dụng web PHP thuần triển khai tại thư mục `/var/www/html/` của máy chủ Apache2 (`login.php`, `dashboard.php`, `logout.php`), mô phỏng hệ thống quản lý hồ sơ và ví học phí sinh viên UTH sử dụng cookie phiên mặc định **`PHPSESSID`**:
+* **Giai đoạn Tấn công (Chế độ lỗ hổng):** Máy chủ chỉ mở HTTP (cổng 80), trong `/etc/php/*/apache2/php.ini` các cờ `session.cookie_httponly` và `session.cookie_secure` đều chưa kích hoạt (trống/tắt).
+* **Giai đoạn Phòng thủ (Chế độ bảo mật):** Kích hoạt mô-đun SSL/TLS của Apache2 (`a2enmod ssl`, cổng 443), cấu hình `session.cookie_httponly = 1`, `session.cookie_secure = 1`, `session.cookie_samesite = "Strict"` và áp dụng hủy phiên triệt để trên máy chủ trong `logout.php`.
 
 ---
 
@@ -198,30 +200,33 @@ Nhóm tự xây dựng ứng dụng web độc lập bằng Node.js thuần (kh�
 # CHƯƠNG 3: KỊCH BẢN VÀ THỰC NGHIỆM TẤN CÔNG (EXPLOITATION PHASE)
 
 ## 3.1. Kịch bản tổng thể
-Kịch bản mô phỏng tình huống một sinh viên UTH kết nối vào mạng Wi-Fi trường học (hoặc quán cà phê) và đăng nhập vào cổng thông tin đào tạo chạy giao thức HTTP không mã hóa. Một kẻ tấn công cùng kết nối mạng này sẽ bắt gói tin, trích xuất Cookie và chiếm đoạt tài khoản.
+Kịch bản mô phỏng tình huống một sinh viên UTH kết nối vào mạng LAN/Wi-Fi dùng chung và đăng nhập vào cổng thông tin đào tạo chạy giao thức HTTP không mã hóa (cổng 80). Một kẻ tấn công sử dụng máy ảo Kali Linux trong cùng phân đoạn mạng sẽ bắt gói tin, trích xuất mã phiên `PHPSESSID` và chiếm đoạt tài khoản mà không cần biết mật khẩu.
 
-## 3.2. Pha 1: Nạn nhân đăng nhập hợp lệ qua HTTP
-* Nạn nhân truy cập `http://localhost:3000/login` và nhập tài khoản: `victim` / `uth123`.
-* Đăng nhập thành công, màn hình hiển thị hồ sơ sinh viên:
-  * Họ tên: *Nguyễn Văn Nạn Nhân*
+## 3.2. Pha 1: Nạn nhân đăng nhập hợp lệ qua HTTP (Cổng 80)
+* Nạn nhân mở trình duyệt Chrome truy cập địa chỉ: `http://192.168.60.129/login.php`.
+* Nhập thông tin tài khoản thử nghiệm: `victim` / `uth123` và nhấn **Đăng nhập**.
+* Trình duyệt chuyển hướng đến `http://192.168.60.129/dashboard.php`, hiển thị thông tin nhạy cảm:
+  * Họ tên: *Nguyễn Văn Nạn Nhân (Sinh viên UTH)*
   * Mã sinh viên: *2251120000*
   * Số tài khoản: *0833386443*
-  * Số dư ví học phí: *25,000,000 VNĐ*
-* Server cấp Cookie: `SESSION_TOKEN=UTH_SESSION_VICTIM_998877`.
+  * Số dư ví học phí: *25.000.000 VNĐ*
+* Server cấp Session Cookie mặc định của PHP dưới dạng bản rõ: `PHPSESSID=b02e9600847bccc441c369f21ba6d8ad` (cả `HttpOnly` và `Secure` đều là `false`).
 
-## 3.3. Pha 2: Bắt gói tin và trích xuất Session Cookie (Wireshark & Hetty)
-* Attacker khởi động Wireshark trên card mạng chung, lọc cú pháp:
-  `http.cookie contains "SESSION_TOKEN"`
-* Attacker phân tích gói tin `GET /dashboard HTTP/1.1` và trích xuất được nguyên vẹn chuỗi:
-  `Cookie: SESSION_TOKEN=UTH_SESSION_VICTIM_998877`
+## 3.3. Pha 2: Bắt gói tin và trích xuất `PHPSESSID` trên Wireshark
+* Trên máy ảo **Kali Linux**, Attacker mở **Wireshark** (`sudo wireshark`), bắt gói tin trên interface **`eth0`** và áp dụng bộ lọc Display Filter:
+  `http.cookie contains "PHPSESSID"`
+* Khi Nạn nhân gửi yêu cầu truy cập `dashboard.php`, Wireshark lập tức bắt được gói tin `GET /dashboard.php HTTP/1.1`.
+* Attacker nhấp chuột phải $\rightarrow$ chọn **Follow $\rightarrow$ HTTP Stream** và đọc được nguyên văn HTTP Header truyền dạng **plaintext**:
+  `Cookie: PHPSESSID=b02e9600847bccc441c369f21ba6d8ad`
 
-## 3.4. Pha 3: Chiếm quyền phiên làm việc (Session Hijacking via Cookie Injection)
-* Attacker mở một trình duyệt hoàn toàn mới (cửa sổ ẩn danh). Khi truy cập thẳng `/dashboard`, Server từ chối và đẩy về trang đăng nhập.
-* Attacker mở tiện ích **Cookie-Editor**, thêm cookie mới:
-  * Name: `SESSION_TOKEN`
-  * Value: `UTH_SESSION_VICTIM_998877`
-  * Path: `/`
-* Attacker nhấn **F5 (Refresh)** $\rightarrow$ Giao diện lập tức hiển thị toàn bộ hồ sơ cá nhân và số dư 25 triệu VNĐ của nạn nhân mà **hoàn toàn không cần nhập mật khẩu**!
+## 3.4. Pha 3: Chiếm quyền phiên làm việc trên Kali Linux (Session Replay)
+* Attacker mở trình duyệt **Firefox** trên máy ảo Kali Linux (chưa từng đăng nhập) và thử truy cập thẳng vào `http://192.168.60.129/dashboard.php`.
+* Do chưa có Cookie hợp lệ, Web Server từ chối và chuyển hướng về `http://192.168.60.129/login.php?error=unauthorized`.
+* Attacker nhấn `F12` mở Developer Tools $\rightarrow$ chọn tab **Storage $\rightarrow$ Cookies $\rightarrow$ `http://192.168.60.129`** (hoặc dùng tiện ích **Cookie-Editor**), thêm Cookie mới:
+  * **Name:** `PHPSESSID`
+  * **Value:** `b02e9600847bccc441c369f21ba6d8ad`
+  * **Path:** `/`
+* Attacker truy cập lại địa chỉ `http://192.168.60.129/dashboard.php` $\rightarrow$ Giao diện lập tức hiển thị toàn bộ hồ sơ cá nhân và số dư ví học phí 25.000.000 VNĐ của nạn nhân mà **hoàn toàn không cần biết username hay password**!
 
 ---
 
@@ -229,24 +234,26 @@ Kịch bản mô phỏng tình huống một sinh viên UTH kết nối vào m�
 
 # CHƯƠNG 4: GIẢI PHÁP PHÒNG THỦ VÀ KIỂM CHỨNG HIỆU QUẢ
 
-## 4.1. Mã hóa toàn trình với HTTPS và kích hoạt HSTS
-Mã hóa lớp giao vận TLS 1.3 biến toàn bộ Header `Cookie` thành chuỗi ciphertext ngẫu nhiên. Kẻ tấn công bắt gói tin trên Wireshark chỉ nhìn thấy các gói tin `TLS Application Data`.
+## 4.1. Mã hóa toàn trình với HTTPS (SSL/TLS cổng 443) và HSTS
+Trên máy ảo `Target-Web-Server`, nhóm kích hoạt giao thức HTTPS cho Apache2 (`sudo a2enmod ssl`, `sudo a2ensite default-ssl.conf`, `sudo systemctl restart apache2`). Mã hóa lớp giao vận TLS biến toàn bộ HTTP Header (bao gồm `Cookie: PHPSESSID=...`) và dữ liệu trang web thành chuỗi bản mã ngẫu nhiên. Kết hợp với chính sách **HSTS (HTTP Strict Transport Security)**, trình duyệt được ép buộc chỉ giao tiếp qua HTTPS nhằm chống lại tấn công hạ cấp giao thức (SSL Stripping).
 
-## 4.2. Cấu hình cờ bảo mật `HttpOnly`, `Secure`, `SameSite`
-* `HttpOnly`: Triệt tiêu nguy cơ mã độc JavaScript đọc trộm Cookie khi web có lỗ hổng XSS.
-* `Secure`: Chỉ cho phép gửi Cookie qua kênh mã hóa HTTPS.
-* `SameSite=Strict`: Ngăn chặn tấn công CSRF.
+## 4.2. Cấu hình cờ bảo mật `HttpOnly`, `Secure`, `SameSite` trong `php.ini`
+Nhóm cấu hình trong tệp `/etc/php/*/apache2/php.ini` của máy chủ Apache:
+* `session.cookie_httponly = 1` (**`HttpOnly`**): Cấm JavaScript (F12 Console hoặc mã độc XSS) truy cập `document.cookie` (áp dụng cho cả HTTP và HTTPS).
+* `session.cookie_secure = 1` (**`Secure`**): Chỉ cho phép trình duyệt gửi Cookie qua kết nối đã mã hóa HTTPS (cổng 443), tuyệt đối không gửi qua HTTP cổng 80.
+* `session.cookie_samesite = "Strict"` (**`SameSite=Strict`**): Ngăn chặn tấn công giả mạo yêu cầu chéo trang CSRF.
 
 ## 4.3. Tái tạo mã phiên sau đăng nhập (Session Regeneration)
-Mỗi khi người dùng đăng nhập thành công, máy chủ lập tức hủy Session ID cũ và phát hành một Session ID ngẫu nhiên mới với độ dài tối thiểu 128-bit (High Entropy), triệt tiêu lỗ hổng Session Fixation.
+Khi người dùng đăng nhập thành công trong `login.php`, ứng dụng gọi hàm `session_regenerate_id(true)` để hủy Session ID cũ và cấp phát một Session ID ngẫu nhiên mới với độ dài và độ ngẫu nhiên cao (High Entropy), triệt tiêu lỗ hổng Session Fixation.
 
 ## 4.4. Quản lý thời gian sống và hủy phiên triệt để khi Logout
-* Thiết lập thời gian chờ không thao tác (Idle Timeout - 15 phút) và thời gian sống tối đa (Absolute Timeout - 8 tiếng).
-* Khi người dùng nhấn "Đăng xuất", máy chủ thực thi lệnh xóa bản ghi phiên trong bộ nhớ RAM (`delete sessions[token]`) và gửi yêu cầu xóa cookie trên trình duyệt.
+* Thiết lập thời gian hết hạn phiên trên máy chủ (`session.gc_maxlifetime`) phù hợp với mức độ nhạy cảm của ứng dụng.
+* Trong tệp `logout.php`, khi người dùng nhấn **"Đăng xuất (Hủy phiên)"**, máy chủ đồng thời thực thi 3 thao tác: xóa sạch mảng `$_SESSION = array()`, gửi lệnh hết hạn Cookie về quá khứ qua `setcookie(..., time() - 42000)`, và gọi **`session_destroy()`** để hủy vĩnh viễn tập tin phiên trên Server.
 
 ## 4.5. Thực nghiệm kiểm chứng lại sau khi áp dụng phòng thủ
-1. **Kiểm chứng cờ `HttpOnly`:** Mở tab Console trên trình duyệt nạn nhân gõ `document.cookie` $\rightarrow$ Trình duyệt trả về chuỗi rỗng `""`.
-2. **Kiểm chứng hủy phiên sau Logout:** Sau khi nạn nhân bấm Đăng xuất, Attacker bấm F5 $\rightarrow$ Ngay lập tức bị văng ra trang đăng nhập vì Session ID cũ đã bị hủy hoàn toàn trên máy chủ.
+1. **Kiểm chứng chống nghe lén qua HTTPS (Port 443):** Khi nạn nhân đăng nhập qua `https://192.168.60.129/login.php`, bộ lọc `http.cookie contains "PHPSESSID"` trên Wireshark của Kali trả về **0 gói tin**. Lọc `tcp.port == 443` chỉ hiển thị **`TLSv1.3 Application Data`** đã bị mã hóa hoàn toàn.
+2. **Kiểm chứng cờ `HttpOnly` (Chống XSS):** Sau khi bật `session.cookie_httponly = 1`, khởi động lại Apache và đăng nhập lại, gõ `document.cookie` trên tab Console (F12) của Chrome trả về chuỗi rỗng **`""`**; kiểm tra tab **Application $\rightarrow$ Cookies** thấy đã kích hoạt đầy đủ dấu tích ở cột `HttpOnly`, `Secure` và `SameSite = Strict`.
+3. **Kiểm chứng hủy phiên sau Logout (Chống Replay Attack):** Ngay khi nạn nhân bấm nút **"Đăng xuất (Hủy phiên)"**, kẻ tấn công trên Kali Linux nhấn `F5` trên trang `dashboard.php` lập tức bị từ chối và đẩy văng về `login.php?error=unauthorized`, chứng minh mã `PHPSESSID` cũ đã bị vô hiệu hóa hoàn toàn trên máy chủ.
 
 ---
 
@@ -265,6 +272,54 @@ Mỗi khi người dùng đăng nhập thành công, máy chủ lập tức hủ
 2. Áp dụng nghiêm ngặt các cờ bảo mật `HttpOnly`, `Secure`, `SameSite` cho mọi Cookie xác thực.
 3. Luôn thực hiện tái tạo phiên (Session Regeneration) sau xác thực và thu hồi phiên triệt để khi người dùng đăng xuất.
 4. Triển khai kiến trúc phòng thủ chiều sâu (Defense-in-Depth) kết hợp xác thực đa yếu tố (MFA/2FA) và giám sát bất thường (Anomaly Detection).
+
+---
+
+\newpage
+
+# PHỤ LỤC
+
+## Phụ lục A: Các lệnh cấu hình Web Server và Bảo mật trên `Target-Web-Server`
+1. **Cài đặt Apache2 và PHP:**
+   ```bash
+   sudo apt update && sudo apt install -y apache2 php libapache2-mod-php
+   sudo cp login.php dashboard.php logout.php /var/www/html/
+   sudo systemctl enable --now apache2
+   ```
+2. **Kích hoạt HTTPS (SSL/TLS cổng 443):**
+   ```bash
+   sudo a2enmod ssl
+   sudo a2ensite default-ssl.conf
+   sudo systemctl restart apache2
+   ```
+3. **Cấu hình cờ bảo mật Cookie trong `/etc/php/*/apache2/php.ini`:**
+   ```ini
+   session.cookie_httponly = 1
+   session.cookie_secure = 1
+   session.cookie_samesite = "Strict"
+   ```
+
+## Phụ lục B: Trích đoạn mã nguồn xử lý phiên (`logout.php` & tăng cường `login.php`)
+```php
+// Trích đoạn logout.php — Hủy phiên toàn diện trên Server và Client
+session_start();
+$_SESSION = array();
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
+}
+session_destroy();
+header('Location: login.php');
+exit;
+```
+
+```php
+// Khuyến nghị bổ sung trong login.php ngay sau khi xác thực thành công
+session_regenerate_id(true);
+```
 
 ---
 

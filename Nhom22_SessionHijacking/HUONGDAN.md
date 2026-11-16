@@ -12,96 +12,113 @@ Thư mục nộp bài được tổ chức theo đúng quy định tại mục 1
 
 ```text
 Nhom22_SessionHijacking/
-├── SETUP/                               # Chứa tài liệu cấu hình môi trường mạng ảo
-│   └── vmware-lab-setup.md              # Hướng dẫn chi tiết cấu hình mạng ảo trên VMware Workstation
-├── SOURCE/                              # Chứa mã nguồn ứng dụng web thử nghiệm (PHP/Apache)
-│   ├── login.php                        # Trang đăng nhập thử nghiệm trên Web Server
-│   ├── dashboard.php                    # Trang hồ sơ sinh viên UTH sau khi đăng nhập
-│   └── secure_dashboard.php             # Phiên bản có cờ bảo mật HttpOnly & Secure
-├── THESIS/                              # Chứa tài liệu văn bản báo cáo và slide thuyết trình
-│   ├── BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md  # Toàn văn báo cáo đồ án chuẩn format UTH (>25 trang)
-│   └── DAN_Y_SLIDE_POWERPOINT.md        # Dàn ý 28 slide PowerPoint chuẩn mẫu UTH (size 32/26)
-├── SOFT/                                # Danh mục phần mềm và link tải
-│   └── DANH_SACH_PHAN_MEM_VA_LINK_DOWNLOAD.md # Danh sách VMware, Wireshark, Hetty, CAIDO, ZAP
-└── HUONGDAN.md                          # Hướng dẫn thực hành Lab chi tiết (File này)
+├── SETUP/                                      # Tài liệu & script cài đặt môi trường ảo VMware
+│   ├── vmware-lab-setup.md                     # Hướng dẫn cấu hình VMware Workstation & Snapshot
+│   └── setup-target-server.sh                  # Script cài đặt tự động Apache2 + PHP cho Server
+├── SOURCE/                                     # Mã nguồn ứng dụng web thử nghiệm (Apache2 + PHP)
+│   ├── login.php                               # Trang đăng nhập Cổng thông tin sinh viên UTH
+│   ├── dashboard.php                           # Trang hồ sơ sinh viên & ví học phí sau đăng nhập
+│   └── logout.php                              # Trang đăng xuất hủy phiên an toàn (session_destroy)
+├── THESIS/                                     # Tài liệu báo cáo và slide thuyết trình
+│   ├── BAO_CAO_DO_AN_SESSION_HIJACKING_UTH.md  # Toàn văn báo cáo đồ án chuẩn form Mẫu 01-BCBTL
+│   └── DAN_Y_SLIDE_POWERPOINT.md               # Dàn ý 28 slide PowerPoint chuẩn mẫu UTH (size 32/26)
+├── SOFT/                                       # Danh mục phần mềm & link tải
+│   └── DANH_SACH_PHAN_MEM_VA_LINK_DOWNLOAD.md  # VMware Workstation, Kali Linux, Wireshark, CEH Tools
+└── HUONGDAN.md                                 # Hướng dẫn vận hành Lab chi tiết (xuất ra HUONGDAN.PDF)
 ```
 
 ---
 
-## 2. YÊU CẦU MÔI TRƯỜNG MÁY ẢO
-* **Phần mềm ảo hóa:** VMware Workstation Pro (hoặc Oracle VirtualBox).
-* **Các máy ảo tham gia mô hình Lab:**
-  1. **VM 1 (Target Web Server):** Ubuntu Server / Linux / Windows Server chạy Apache HTTP (Cổng 80) — IP: `192.168.100.10`.
-  2. **VM 2 (Nạn nhân - Victim):** Windows 10/11 có trình duyệt Chrome / Edge — IP: `192.168.100.20`.
-  3. **VM 3 (Kẻ tấn công - Attacker):** Kali Linux có cài sẵn Wireshark, Bettercap/arpspoof và Firefox — IP: `192.168.100.30`.
-* **Card mạng ảo:** `VMnet2 (Host-only)`, dải mạng nội bộ: `192.168.100.0/24`.
+## 2. MÔI TRƯỜNG ẢO HÓA & PHÂN VAI HỆ THỐNG
+
+Toàn bộ mô hình chạy trên **VMware Workstation Pro 17** (card mạng ảo `VMnet8 NAT`, dải mạng `192.168.60.0/24`):
+
+1. **Máy chủ Mục tiêu (`Target-Web-Server`):** Máy ảo Kali/Debian Linux chạy **Apache2 + PHP**, lắng nghe HTTP cổng `80` và HTTPS cổng `443` — IP: **`192.168.60.129`**.
+2. **Máy Nạn nhân (Victim — Host Windows):** Máy thật Windows (`192.168.60.1`) sử dụng trình duyệt **Google Chrome** đăng nhập tài khoản sinh viên.
+3. **Máy Tấn công (`kali-linux-2026.3-vmware-amd64`):** Máy ảo Kali Linux sử dụng **Wireshark** (bắt gói tin trên card `eth0`) và trình duyệt **Firefox** (F12 Storage / Cookie-Editor).
 
 ---
 
-## 3. CÁC BƯỚC THIẾT LẬP MẠNG LAB TRÊN VMWARE WORKSTATION
+## 3. CÁC BƯỚC THIẾT LẬP TRƯỚC KHI DEMO
 
-1. **Tạo card mạng `VMnet2`:**
-   * Mở VMware $\rightarrow$ chọn menu **Edit** $\rightarrow$ **Virtual Network Editor...** $\rightarrow$ **Change Settings**.
-   * Nhấn **Add Network...** $\rightarrow$ chọn **VMnet2** $\rightarrow$ Chọn chế độ **Host-only**.
-   * Cấu hình Subnet IP: `192.168.100.0`, Subnet mask: `255.255.255.0`.
-   * Bấm **Apply** $\rightarrow$ **OK**.
-2. **Gán card mạng cho 3 máy ảo:**
-   * Với mỗi máy ảo (Server, Victim, Kali Linux): Chuột phải $\rightarrow$ **Settings...** $\rightarrow$ **Network Adapter** $\rightarrow$ Chọn **Custom: Specific virtual network** $\rightarrow$ Chọn **VMnet2 (Host-only)**.
-3. **Kiểm tra thông mạng:**
-   * Từ máy Kali Linux (`192.168.100.30`), mở terminal gõ:
-     ```bash
-     ping 192.168.100.10   # Ping Server
-     ping 192.168.100.20   # Ping Victim
-     ```
+1. **Khởi động 2 máy ảo trong VMware Workstation:**
+   * Bật **`Target-Web-Server`** (`192.168.60.129`) và **`kali-linux-2026.3-vmware-amd64`**.
+2. **Đảm bảo Web Server Apache2 & PHP đã được nạp code từ thư mục `SOURCE/`:**
+   * Chạy script `SETUP/setup-target-server.sh` trên máy ảo `Target-Web-Server` (hoặc copy 3 file `login.php`, `dashboard.php`, `logout.php` vào `/var/www/html/` và chạy `sudo systemctl enable --now apache2`).
+3. **Kiểm tra thông mạng từ Host Windows và Kali Attacker:**
+   ```bash
+   ping 192.168.60.129
+   ```
 
 ---
 
 ## 4. QUY TRÌNH 4 BƯỚC DEMO TẤN CÔNG & PHÒNG THỦ
 
-### BƯỚC 1: NẠN NHÂN ĐĂNG NHẬP TRÊN VM WINDOWS
-1. Trên máy ảo **Windows Victim (`192.168.100.20`)**, mở trình duyệt.
-2. Truy cập: `http://192.168.100.10/login.php` (hoặc `/dvwa/login.php`).
-3. Đăng nhập tài khoản: `victim` / `uth123`.
-4. Xem thông tin cá nhân và số dư ví tại `dashboard.php`.
-5. Server cấp Cookie phiên: `PHPSESSID=...` trên giao thức HTTP không mã hóa.
-
----
-
-### BƯỚC 2: TIN TẶC BẮT GÓI TIN TRÊN VM KALI LINUX
-1. Mở Terminal Kali Linux, thực hiện chuyển hướng lưu lượng bằng ARP Spoofing:
+### BƯỚC 1: THIẾT LẬP MÔI TRƯỜNG TẤN CÔNG (WIRESHARK TRÊN KALI)
+1. Trên máy ảo **Kali Attacker**, mở **Wireshark**:
    ```bash
-   sudo sysctl -w net.ipv4.ip_forward=1
-   sudo arpspoof -i eth0 -t 192.168.100.20 192.168.100.10
+   sudo wireshark
    ```
-2. Khởi động **Wireshark** trên Kali Linux, lắng nghe trên card `eth0`.
-3. Nhập bộ lọc:
+   *(Mật khẩu `sudo` là `kali`).*
+2. Chọn bắt gói tin trên card mạng **`eth0`**.
+3. Nhập bộ lọc Display Filter:
    ```wireshark
    http.cookie contains "PHPSESSID"
    ```
-4. Khi Nạn nhân lướt web, gói tin HTTP lộ diện. Chuột phải chọn **Follow $\rightarrow$ HTTP Stream**.
-5. Đọc trực tiếp chuỗi: `Cookie: PHPSESSID=xxxxxx`.
 
 ---
 
-### BƯỚC 3: TIN TẶC CHIẾM QUYỀN PHIÊN (SESSION HIJACKING)
-1. Mở trình duyệt Firefox trên máy **Kali Linux (`192.168.100.30`)**.
-2. Truy cập: `http://192.168.100.10/dashboard.php` $\rightarrow$ Bị chặn do chưa đăng nhập.
-3. Nhấn `F12` $\rightarrow$ chọn tab **Storage** $\rightarrow$ **Cookies** (hoặc dùng tiện ích **Cookie-Editor**):
-   * Thêm Cookie mới:
-     * **Name:** `PHPSESSID`
-     * **Value:** `xxxxxx` (Giá trị bắt được từ Wireshark)
-     * **Path:** `/`
-4. Nhấn **F5 (Refresh)** $\rightarrow$ **Đăng nhập tức thì vào tài khoản của Nạn nhân mà KHÔNG CẦN PASSWORD!**
+### BƯỚC 2: NẠN NHÂN ĐĂNG NHẬP & TIN TẶC ĐÁNH CẮP COOKIE + CHIẾM PHIÊN (HTTP CỔNG 80)
+1. **Nạn nhân đăng nhập (trên Chrome Windows):**
+   * Truy cập giao thức không mã hóa: **`http://192.168.60.129/login.php`**
+   * Đăng nhập tài khoản: **`victim`** / **`uth123`** $\rightarrow$ Chuyển hướng vào **`dashboard.php`** hiển thị họ tên *Nguyễn Văn Nạn Nhân* và ví học phí *25.000.000 VNĐ*.
+2. **Tin tặc bắt gói tin (trên Wireshark máy Kali):**
+   * Quan sát gói tin `GET /dashboard.php HTTP/1.1` hiện lên ở chế độ bản rõ (plaintext).
+   * Nhấp chuột phải $\rightarrow$ **Follow** $\rightarrow$ **HTTP Stream** $\rightarrow$ Đọc và copy nguyên giá trị Cookie:  
+     `Cookie: PHPSESSID=xxxxxxxxxxxxxxxxxxxxxxxxxx`
+3. **Tin tặc chiếm quyền phiên (trên Firefox máy Kali):**
+   * Mở Firefox trên Kali, thử truy cập thẳng **`http://192.168.60.129/dashboard.php`** $\rightarrow$ Bị chặn và đá về **`login.php?error=unauthorized`**.
+   * Nhấn **`F12`** $\rightarrow$ tab **Storage** $\rightarrow$ **Cookies** $\rightarrow$ `http://192.168.60.129` (hoặc dùng extension **Cookie-Editor**):
+     * Bấm dấu **(+)** thêm Cookie mới: **Name:** `PHPSESSID` | **Value:** *(dán chuỗi vừa bắt)* | **Path:** `/`.
+   * Đổi lại thanh địa chỉ thành **`http://192.168.60.129/dashboard.php`** và nhấn **Enter**:
+   * **Kết quả:** Toàn bộ hồ sơ sinh viên và số dư 25.000.000 VNĐ của nạn nhân hiện ra ngay lập tức mà **HOÀN TOÀN KHÔNG CẦN MẬT KHẨU!**
 
 ---
 
-### BƯỚC 4: TRIỂN KHAI PHÒNG THỦ & KIỂM CHỨNG
-1. **Bật mã hóa HTTPS trên Server:**
-   * Kích hoạt SSL: `sudo a2enmod ssl && sudo a2ensite default-ssl.conf && sudo systemctl restart apache2`.
-   * Nạn nhân chuyển sang truy cập: `https://192.168.100.10/dashboard.php`.
-   * Wireshark trên Kali chỉ còn thấy gói tin **TLS Encrypted Application Data**, hoàn toàn không đọc được Cookie.
-2. **Cấu hình cờ bảo mật Cookie trong `php.ini`:**
-   * `session.cookie_httponly = 1`
-   * `session.cookie_secure = 1`
-   * `session.cookie_samesite = "Strict"`
-3. **Kiểm chứng:** Mở Console trên máy Nạn nhân gõ `document.cookie` $\rightarrow$ Trả về `""` (chống XSS đánh cắp Cookie).
+### BƯỚC 3: TRIỂN KHAI 3 LỚP GIẢI PHÁP PHÒNG THỦ (TRÊN `TARGET-WEB-SERVER`)
+
+1. **Lớp 1 — Bật mã hóa toàn trình HTTPS (SSL/TLS cổng 443):**
+   ```bash
+   sudo a2enmod ssl
+   sudo a2ensite default-ssl.conf
+   sudo systemctl restart apache2
+   ```
+2. **Lớp 2 — Bật cờ bảo mật Cookie (`HttpOnly`, `Secure`, `SameSite`):**
+   Mở `/etc/php/*/apache2/php.ini`:
+   ```bash
+   sudo nano /etc/php/*/apache2/php.ini
+   ```
+   Tìm cụm `session.cookie_httponly` (`Ctrl + W`) và sửa thành:
+   ```ini
+   session.cookie_httponly = 1
+   session.cookie_secure = 1
+   session.cookie_samesite = "Strict"
+   ```
+   Lưu lại (`Ctrl + O` $\rightarrow$ `Enter` $\rightarrow$ `Ctrl + X`) và khởi động lại Apache:
+   ```bash
+   sudo systemctl restart apache2
+   ```
+3. **Lớp 3 — Hủy phiên triệt để khi Đăng xuất (`logout.php`):**
+   * `logout.php` xóa sạch mảng `$_SESSION`, đặt thời gian hết hạn Cookie về quá khứ và gọi `session_destroy()`.
+
+---
+
+### BƯỚC 4: KIỂM CHỨNG HIỆU QUẢ SAU KHI PHÒNG THỦ
+
+1. **Chống nghe lén mạng (HTTPS Port 443):**
+   * Nạn nhân mở tab mới truy cập **`https://192.168.60.129/login.php`** và đăng nhập lại.
+   * Trên **Wireshark (Kali)**, lọc `http.cookie contains "PHPSESSID"` **không bắt được bất kỳ gói tin nào**; lọc `tcp.port == 443` chỉ thấy **`TLSv1.3 Application Data`** đã bị mã hóa hoàn toàn.
+2. **Chống XSS đọc trộm Cookie (`HttpOnly`):**
+   * Sau khi đăng nhập lại qua HTTPS, trên Chrome Windows nhấn **`F12` $\rightarrow$ Console**, gõ **`document.cookie`** $\rightarrow$ Kết quả trả về chuỗi rỗng **`""`** (JavaScript bị chặn hoàn toàn).
+3. **Chống Replay Attack khi Đăng xuất (`session_destroy()`):**
+   * Nạn nhân bấm nút **"Đăng xuất (Hủy phiên)"** $\rightarrow$ Attacker trên Kali bấm **F5** lập tức bị văng về `login.php?error=unauthorized`, Cookie cũ bị vô hiệu hóa vĩnh viễn.

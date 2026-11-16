@@ -223,9 +223,9 @@ Do Switch ảo của VMware phân luồng lưu lượng, Attacker cần dùng k�
      ```
 
 ### Kỹ thuật 2: Bắt và giải mã Session Cookie bằng Wireshark
-1. Khởi động **Wireshark** trên Kali Linux:
+1. Khởi động **Wireshark** trên Kali Linux (không dùng dấu `&` ở cuối để nhập được mật khẩu `sudo`):
    ```bash
-   sudo wireshark &
+   sudo wireshark
    ```
 2. Chọn lắng nghe trên card mạng `eth0` (card kết nối vào `VMnet2`).
 3. Trong ô Display Filter, gõ cú pháp lọc:

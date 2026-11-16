@@ -134,105 +134,105 @@
 ### SLIDE 12: MÔ HÌNH KIẾN TRÚC PHÒNG LAB ẢO HÓA AN TOÀN
 * **Tiêu đề (Size 32):** MÔ HÌNH LAB ẢO HÓA AN TOÀN (TOPOLOGY)
 * **Nội dung (Size 26):**
-  * Đáp ứng tiêu chuẩn mục 2 trong file đề tài UTH
-  * Triển khai mạng nội bộ cô lập (Dải mạng ảo: `192.168.100.0/24`)
-  * Sử dụng VMware Workstation Pro (card Host-only VMnet2) hoặc Docker
-  * Đảm bảo tính an toàn, không gây ảnh hưởng đến mạng ngoài
+  * Đáp ứng tiêu chuẩn mục 2 trong file `DeTai.pdf` của UTH
+  * Chạy hoàn toàn trên **VMware Workstation Pro 17** (dải mạng `192.168.60.0/24`)
+  * Sử dụng 2 máy ảo Linux + máy Host Windows trong mạng nội bộ tách biệt
+  * Quản lý từng pha thử nghiệm bằng **VMware Snapshot**
 
 ---
 
 ### SLIDE 13: CÁC THỰC THỂ TRONG MÔ HÌNH LAB
 * **Tiêu đề (Size 32):** PHÂN VAI CÁC THỰC THỂ TRONG HỆ THỐNG LAB
 * **Nội dung (Size 26):**
-  * **1. Target Web Server (`192.168.100.10`):** Cổng thông tin sinh viên UTH
-  * **2. Nạn nhân - Victim (`192.168.100.20`):** Trình duyệt Chrome đăng nhập
-  * **3. Tin tặc - Attacker (`192.168.100.30`):** Wireshark & Cookie-Editor
+  * **1. `Target-Web-Server` (`192.168.60.129`):** Máy ảo Linux chạy Apache2 + PHP (Cổng 80/443)
+  * **2. Nạn nhân — Victim (`192.168.60.1`):** Máy Windows mở Chrome đăng nhập UTH Portal
+  * **3. Tin tặc — Attacker (`kali-linux`):** VM Kali chạy Wireshark (`eth0`) & Firefox
 
 ---
 
 ### SLIDE 14: KỊCH BẢN TỔNG THỂ 4 BƯỚC DEMO
 * **Tiêu đề (Size 32):** KỊCH BẢN THỰC NGHIỆM 4 BƯỚC DEMO
 * **Nội dung (Size 26):**
-  * **Bước 1:** Thiết lập môi trường Lab
-  * **Bước 2:** Thực hiện tấn công khai thác trên HTTP
-  * **Bước 3:** Triển khai giải pháp phòng thủ toàn diện
-  * **Bước 4:** Kiểm tra lại hiệu quả sau khi phòng thủ
+  * **Bước 1:** Thiết lập môi trường Lab ảo hóa VMware (Apache2 + PHP)
+  * **Bước 2:** Thực hiện tấn công nghe lén & chiếm phiên trên HTTP (Cổng 80)
+  * **Bước 3:** Triển khai phòng thủ (HTTPS 443 + `HttpOnly`/`Secure` + Logout)
+  * **Bước 4:** Kiểm chứng hiệu quả trên Wireshark, F12 Console và Firefox Attacker
 
 ---
 
 ### SLIDE 15: BƯỚC 1 - THIẾT LẬP MÔI TRƯỜNG LAB
 * **Tiêu đề (Size 32):** BƯỚC 1: THIẾT LẬP MÔI TRƯỜNG LAB
 * **Nội dung (Size 26):**
-  * Khởi động máy chủ Node.js: `node server.js` tại cổng HTTP 3000
-  * Trạng thái mặc định: Chế độ Lỗ hổng (Vulnerable Plaintext Mode)
-  * Khởi động card mạng lắng nghe trên Wireshark / Hetty
+  * Khởi động 2 máy ảo `Target-Web-Server` & `kali-linux` trên VMware
+  * `Target-Web-Server` chạy Apache2 + PHP (`login.php`, `dashboard.php`, `logout.php`)
+  * Trạng thái ban đầu (Snapshot `Http`): Mở cổng HTTP 80, tắt cờ `HttpOnly`
+  * Máy Kali Attacker bật **Wireshark** bắt gói tin trên card `eth0`
 
 ---
 
 ### SLIDE 16: BƯỚC 2 (PHA 1) - NẠN NHÂN ĐĂNG NHẬP HỢP PHÁP
 * **Tiêu đề (Size 32):** NẠN NHÂN ĐĂNG NHẬP CỔNG THÔNG TIN UTH
 * **Nội dung (Size 26):**
-  * Nạn nhân truy cập `http://localhost:3000/login`
+  * Nạn nhân truy cập `http://192.168.60.129/login.php`
   * Đăng nhập thành công với tài khoản: `victim` / `uth123`
   * Xem hồ sơ cá nhân và số dư ví học phí: **25.000.000 VNĐ**
-  * Server cấp Session Cookie: `SESSION_TOKEN=UTH_SESSION_VICTIM_998877`
+  * Server cấp Session Cookie mặc định PHP: `PHPSESSID=...` (không có cờ bảo mật)
 
 ---
 
 ### SLIDE 17: BƯỚC 2 (PHA 2) - BẮT GÓI TIN TRÊN WIRESHARK
 * **Tiêu đề (Size 32):** TIN TẶC BẮT GÓI TIN CHỨA COOKIE
 * **Nội dung (Size 26):**
-  * Bộ lọc Wireshark: `http.cookie contains "SESSION_TOKEN"`
-  * Dữ liệu truyền dạng plaintext lộ rõ 100% trong HTTP Header
-  * Attacker trích xuất được Session Token mà không cần bẻ khóa mật khẩu!
+  * Bộ lọc Wireshark: `http.cookie contains "PHPSESSID"`
+  * Dữ liệu truyền dạng plaintext lộ rõ 100% qua `Follow -> HTTP Stream`
+  * Attacker trích xuất nguyên giá trị `PHPSESSID` mà không cần bẻ khóa mật khẩu!
 
 ---
 
 ### SLIDE 18: BƯỚC 2 (PHA 3) - CHIẾM QUYỀN PHIÊN (SESSION HIJACKING)
-* **Tiêu đề (Size 32):** CHIẾM QUYỀN PHIÊN VỚI COOKIE-EDITOR
+* **Tiêu đề (Size 32):** CHIẾM QUYỀN PHIÊN TRÊN FIREFOX (KALI LINUX)
 * **Nội dung (Size 26):**
-  * Attacker mở trình duyệt ẩn danh mới tinh (chưa từng đăng nhập)
-  * Dùng tiện ích Cookie-Editor dán `SESSION_TOKEN` vào
-  * Nhấn F5 (Refresh) $\rightarrow$ Đăng nhập tức thì vào trang cá nhân nạn nhân!
-  * **Thành công chiếm quyền mà KHÔNG CẦN USERNAME/PASSWORD!**
+  * Attacker mở Firefox trên Kali (chưa đăng nhập, truy cập `/dashboard.php` bị chặn)
+  * Mở F12 $\rightarrow$ tab `Storage` (hoặc Cookie-Editor) thêm Cookie `PHPSESSID` vừa bắt được
+  * Truy cập lại `http://192.168.60.129/dashboard.php` $\rightarrow$ Vào thẳng trang nạn nhân!
+  * **Chiếm quyền thành công 100% mà KHÔNG CẦN USERNAME/PASSWORD!**
 
 ---
 
 ### SLIDE 19: BƯỚC 3 - TRIỂN KHAI PHÒNG THỦ MÃ HÓA HTTPS
 * **Tiêu đề (Size 32):** PHÒNG THỦ: MÃ HÓA TOÀN TRÌNH VỚI HTTPS
 * **Nội dung (Size 26):**
-  * Nâng cấp lên HTTPS (giao thức TLS 1.3 / SSL cổng 443)
-  * Dữ liệu HTTP Header (kể cả Cookie) bị mã hóa thành chuỗi ngẫu nhiên
-  * Wireshark chỉ thấy các gói tin `TLS Application Data` vô nghĩa
-  * Kích hoạt chính sách **HSTS** chống hạ cấp giao thức
+  * Bật SSL/TLS cổng 443 trên Apache2: `a2enmod ssl && a2ensite default-ssl.conf`
+  * Toàn bộ HTTP Header (kể cả `PHPSESSID`) bị mã hóa bằng TLS 1.3
+  * Bộ lọc `http.cookie contains "PHPSESSID"` trên Wireshark trả về **trống**
+  * Lọc `tcp.port == 443` chỉ thấy các gói tin `TLSv1.3 Application Data` vô nghĩa
 
 ---
 
 ### SLIDE 20: BƯỚC 3 - CẤU HÌNH CÁC CỜ COOKIE BẢO MẬT
-* **Tiêu đề (Size 32):** THIẾT LẬP CỜ BẢO MẬT CHO COOKIE
+* **Tiêu đề (Size 32):** THIẾT LẬP CỜ BẢO MẬT TRONG `php.ini`
 * **Nội dung (Size 26):**
-  * **`HttpOnly`:** Ngăn JavaScript đọc `document.cookie` (chống XSS)
-  * **`Secure`:** Bắt buộc Cookie chỉ được truyền qua kênh HTTPS
-  * **`SameSite=Strict`:** Ngăn chặn tấn công giả mạo yêu cầu CSRF
+  * **`session.cookie_httponly = 1`:** Ngăn JavaScript (`document.cookie`) đọc Cookie (chống XSS)
+  * **`session.cookie_secure = 1`:** Bắt buộc Cookie chỉ truyền qua HTTPS (chống Wireshark)
+  * **`session.cookie_samesite = "Strict"`:** Ngăn chặn tấn công giả mạo yêu cầu CSRF
 
 ---
 
-### SLIDE 21: BƯỚC 3 - TÁI TẠO PHIÊN & QUẢN LÝ THỜI GIAN CHỜ
-* **Tiêu đề (Size 32):** TÁI TẠO MÃ PHIÊN & QUẢN LÝ VÒNG ĐỜI
+### SLIDE 21: BƯỚC 3 - TÁI TẠO PHIÊN & HỦY PHIÊN KHI ĐĂNG XUẤT
+* **Tiêu đề (Size 32):** TÁI TẠO MÃ PHIÊN & HỦY PHIÊN KHI LOGOUT
 * **Nội dung (Size 26):**
-  * **Session Regeneration:** Đổi ID mới ngay sau khi đăng nhập (chống Fixation)
-  * **Idle Timeout (15 phút):** Tự động hủy phiên nếu không hoạt động
-  * **Absolute Timeout (8 tiếng):** Buộc đăng nhập lại định kỳ
-  * **Logout:** Xóa triệt để Session trên RAM máy chủ
+  * **Session Regeneration:** Dùng `session_regenerate_id(true)` sau khi đăng nhập (chống Fixation)
+  * **Session Timeout:** Giới hạn thời gian sống `session.gc_maxlifetime`
+  * **Logout an toàn (`logout.php`):** Xóa `$_SESSION`, hết hạn Cookie và gọi `session_destroy()`
 
 ---
 
 ### SLIDE 22: BƯỚC 4 - KIỂM CHỨNG HIỆU QUẢ SAU PHÒNG VỆ
 * **Tiêu đề (Size 32):** BƯỚC 4: KIỂM CHỨNG LẠI HIỆU QUẢ PHÒNG THỦ
 * **Nội dung (Size 26):**
-  * **1. Chống XSS:** Gõ `document.cookie` trên F12 Console $\rightarrow$ Trả về `""`
-  * **2. Chống Replay:** Nạn nhân bấm Logout $\rightarrow$ Cookie trên máy Attacker lập tức bị vô hiệu hóa
-  * **3. Kết quả:** Toàn bộ các con đường khai thác đã bị chặn đứng!
+  * **1. Chống Sniffing:** Wireshark cổng 443 chỉ thấy `TLSv1.3 Application Data`
+  * **2. Chống XSS:** Gõ `document.cookie` trên F12 Console $\rightarrow$ Trả về rỗng `""`
+  * **3. Chống Replay:** Nạn nhân bấm Đăng xuất $\rightarrow$ Attacker F5 bị văng ra trang Login!
 
 ---
 

@@ -29,7 +29,7 @@
 
 ### 2.2. Yêu cầu về Môi trường Lab (Thử nghiệm an toàn)
 * Xây dựng mô hình mạng nội bộ thử nghiệm (dùng VMware Workstation / VirtualBox hoặc các máy trong cùng mạng LAN):
-  * **Máy Chủ (Server/Target App):** Triển khai một ứng dụng web đăng nhập chạy HTTP (ví dụ: DVWA, bWAPP, Juice Shop hoặc một ứng dụng PHP/Node.js tự dựng).
+  * **Máy Chủ (Server/Target App):** Triển khai ứng dụng web PHP/Apache2 trên máy ảo VMware (`Target-Web-Server`) chạy HTTP cổng 80.
   * **Máy Nạn nhân (Victim):** Đăng nhập vào ứng dụng web trên kênh HTTP bình thường.
   * **Máy Tấn công (Attacker):** Cùng dải mạng nội bộ hoặc đứng ở vị trí Man-in-the-Middle để nghe lén/can thiệp lưu lượng.
 

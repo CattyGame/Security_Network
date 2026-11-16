@@ -16,10 +16,11 @@ CEH v13 OCT 2024/
 *.msi
 
 # Dependency & Cache
-node_modules/
-npm-debug.log*
 .DS_Store
 Thumbs.db
+*.7z
+*.vmwarevm/
+my_cert.crt
 
 # Workspace temp
 .agent/
